@@ -12,7 +12,11 @@ import cv2
 import numpy as np
 import time
 
+from win10toast import ToastNotifier
+
 faceModel = cv2.CascadeClassifier("res/haarcascade_frontalface_default.xml")
+toaster = ToastNotifier()
+
 
 class CalculationTime:
 
@@ -20,7 +24,13 @@ class CalculationTime:
         self.frame = ''
         self.face = ''
         self.status = ''
-        self.startTimeFind = time.time()
+        self.startFace = time.time()
+        self.startNoFace = time.time()
+        self.lookCom = 0
+        self.dontLookCom = 0
+        self.rateReset = 3
+        self.breakMin = 20
+        self.breakHour = 2
 
     def callFrame(self, frame):
         self.frame = frame
@@ -31,30 +41,43 @@ class CalculationTime:
 
     def drawFace(self):
         for x, y, w, h in self.face:
-            cv2.rectangle(self.frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            cv2.rectangle(self.frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     def statusFace(self):
 
-        if type(self.face) == tuple:
-            self.status = "No Face"
-            elapsed_time = 0
-            self.startTimeFind = time.time()
+        if self.face != ():  # พบใบหน้า
+            self.status = True
+            self.lookCom = time.time() - self.startFace
+
+            self.startNoFace = time.time()
+            self.dontLookCom = 0
 
         else:
-            self.status = "Face"
-            elapsed_time = time.time() - self.startTimeFind
+            self.status = False  # ไม่พบใบหน้า
+            self.dontLookCom = time.time() - self.startNoFace
 
-        print(f'{self.status} {time.strftime("%H:%M:%S", time.gmtime(elapsed_time))}')
+            if self.dontLookCom > self.rateReset:
+                self.lookCom = 0
+                self.startFace = time.time()
 
-    def startTimeNoFind(self):
-        if self.status == "No Face":
-            self.startHideFace = time.time()
+        print(f'Face:{self.status} Look Time: {time.strftime("%H:%M:%S", time.gmtime(self.lookCom))}')
+        loookHour, lookMin, lookSecond = time.gmtime(self.lookCom)[3:6]
 
+        if lookMin > self.breakMin:
+            print("Pop up 15 sec.")
+
+        if lookSecond > 10:
+            notic = toaster.show_toast(title="You Risk!!!",
+                                        msg="you look computer more 15 min",
+                                        icon_path="graphic/icon.ico",
+                                        duration=5,
+                                        threaded=True)
 
 
 _CalculationTime = CalculationTime()
 
 Builder.load_file("gui.kv")
+
 
 class FrameToKivy(Image):
 
@@ -67,9 +90,10 @@ class FrameToKivy(Image):
         image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
         self.texture = image_texture
 
-class Main(Widget):
 
+class Main(Widget):
     frameToKivy = ObjectProperty(None)
+    textLookTime = StringProperty("")
 
     def __init__(self, cap, **kwargs):
         super(Main, self).__init__(**kwargs)
@@ -92,8 +116,8 @@ class EyeBreakApp(App):
     def build(self):
         self.cap = cv2.VideoCapture(0)
         app = Main(self.cap)
-        Clock.schedule_interval(app.update, 1/30)
-        self.icon = 'res/icon.ico'
+        Clock.schedule_interval(app.update, 1 / 30)
+        self.icon = 'graphic/icon_eye_break.png'
         return app
 
     def on_stop(self):
