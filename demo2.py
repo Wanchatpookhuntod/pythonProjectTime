@@ -4,19 +4,16 @@ from kivy.core.window import Window
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+from kivy.properties import ObjectProperty
 from kivy.lang.builder import Builder
-from kivy.uix.popup import Popup
-from kivy.config import Config
 import cv2
-import numpy as np
 import time
-
 from win10toast import ToastNotifier
 
-faceModel = cv2.CascadeClassifier("res/haarcascade_frontalface_default.xml")
+faceModel = cv2.CascadeClassifier('res/haarcascade_frontalface_default.xml')
 toaster = ToastNotifier()
 
+Window.size = (640 * .7, 680)
 
 class CalculationTime:
 
@@ -27,10 +24,16 @@ class CalculationTime:
         self.startFace = time.time()
         self.startNoFace = time.time()
         self.lookCom = 0
-        self.dontLookCom = 0
+        self.noLookCom = 0
         self.rateReset = 3
         self.breakMin = 20
         self.breakHour = 2
+        self.timeLook = ""
+        self.popUpStatus = ""
+        self.titlePopup = "Eye Risk !!!"
+        self.msgPopup = "Your gaze at the screen for"
+        self.statusNormal = "Your eyes are normal."
+        self.popProtect = ""
 
     def callFrame(self, frame):
         self.frame = frame
@@ -41,41 +44,53 @@ class CalculationTime:
 
     def drawFace(self):
         for x, y, w, h in self.face:
-            cv2.rectangle(self.frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.rectangle(self.frame, (x, y), (x + w, y + h), (255, 54, 118), 2)
 
     def statusFace(self):
-
         if self.face != ():  # พบใบหน้า
             self.status = True
             self.lookCom = time.time() - self.startFace
 
             self.startNoFace = time.time()
-            self.dontLookCom = 0
+            self.noLookCom = 0
 
         else:
             self.status = False  # ไม่พบใบหน้า
-            self.dontLookCom = time.time() - self.startNoFace
+            self.noLookCom = time.time() - self.startNoFace
 
-            if self.dontLookCom > self.rateReset:
+            if self.noLookCom > self.rateReset:
                 self.lookCom = 0
                 self.startFace = time.time()
 
-        print(f'Face:{self.status} Look Time: {time.strftime("%H:%M:%S", time.gmtime(self.lookCom))}')
-        loookHour, lookMin, lookSecond = time.gmtime(self.lookCom)[3:6]
+        self.timeLook = time.strftime("%H:%M:%S", time.gmtime(self.lookCom))
 
-        if lookMin > self.breakMin:
+        self.lookHour, self.lookMin, self.lookSecond = time.gmtime(self.lookCom)[3:6]
+
+        if self.lookMin > self.breakMin:
             print("Pop up 15 sec.")
 
-        if lookSecond > 10:
-            notic = toaster.show_toast(title="You Risk!!!",
-                                        msg="you look computer more 15 min",
-                                        icon_path="graphic/icon.ico",
-                                        duration=5,
-                                        threaded=True)
+        if self.lookSecond > 10:
+            toaster.show_toast(title=self.titlePopup,
+                               msg=f"{self.msgPopup} {self.timeLook} .\n"
+                                   f"So you should rest your eyes for 15 seconds..",
+                               icon_path="graphic/icon.ico",
+                               duration=5,
+                               threaded=True)
+
+            self.popUpStatus = self.titlePopup
+            self.popProtect = "So you should rest your eyes for 15 seconds..."
+        else:
+            self.popUpStatus = self.statusNormal
+            self.popProtect = ""
+
+    def getTimeLook(self):
+        return self.timeLook
+
+    def getStatusText(self):
+        return self.popUpStatus, self.popProtect
 
 
 _CalculationTime = CalculationTime()
-
 Builder.load_file("gui.kv")
 
 
@@ -93,12 +108,25 @@ class FrameToKivy(Image):
 
 class Main(Widget):
     frameToKivy = ObjectProperty(None)
-    textLookTime = StringProperty("")
+    textLookTime = ObjectProperty(None)
+    statusRisk = ObjectProperty(None)
+    textProtect = ObjectProperty(None)
+    btnStart = ObjectProperty(None)
+
 
     def __init__(self, cap, **kwargs):
         super(Main, self).__init__(**kwargs)
         self.cap = cap
         self.output = self.frameToKivy
+
+    def detect_toggle(self):
+        click = self.btnStart.state == "down"
+        if click:
+            self.btnStart.text = "STOP"
+            # self.x = 1
+        else:
+            self.btnStart.text = "START"
+            # self.x = 0
 
     def update(self, dt):
         frame = self.cap.read()[1]  # <<< start frame app
@@ -108,7 +136,15 @@ class Main(Widget):
         _CalculationTime.drawFace()
         _CalculationTime.statusFace()
 
+        self.textLookTime.text = _CalculationTime.getTimeLook()
+        self.statusRisk.text = _CalculationTime.getStatusText()[0]
+        self.textProtect.text = _CalculationTime.getStatusText()[1]
+
         self.output.outputFrame(frame)
+
+        if Window.size[0] < 640 * .7 or Window.size[1] < 680 or \
+                Window.size[0] > 640 * .7 or Window.size[1] > 680:
+            Window.size = (640 * .7, 680)
 
 
 class EyeBreakApp(App):

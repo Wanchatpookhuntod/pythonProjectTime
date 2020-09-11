@@ -1,19 +1,20 @@
-# coding:utf-8
-from kivy.app import App
-from kivy.uix.image import Image
-from kivy.clock import Clock
-from kivy.graphics.texture import Texture
-import cv2
-from kivy.config import Config
+from win10toast import ToastNotifier
+import time
 
-Config.set('kivy','window_icon',r"C:\Users\USER\Codepython\pythonProjectTime\res\inter.png")
+toaster = ToastNotifier()
+# toaster.show_toast("Hello World!!!",
+#                    "Python is 10 seconds awsm!",
+#                    icon_path="custom.ico",
+#                    duration=2)
 
-
-
-class CamApp(App):
-    def build(self):
-        return
-
-
-if __name__ == '__main__':
-    App().run()
+x = toaster.show_toast("Example two",
+                   "This notification is in it's own thread!\n"
+                   "This notification is in it's own thread!\n"
+                   "This notification is in it's own thread!\n"
+                   "This notification is in it's own thread!\n"
+                   "This notification is in it's own thread!",
+                   icon_path=None,
+                   duration=5,
+                   threaded=True)
+print(x)
+# Wait for threaded notification to finish

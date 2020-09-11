@@ -1,11 +1,46 @@
 <FrameToKivy>:
 <Main>:
     frameToKivy: frameToKivy
+    textLookTime: textLookTime
+    statusRisk: statusRisk
+    textProtect:textProtect
+    btnStart: btnStart
 
     FrameToKivy:
         id: frameToKivy
         size: 640 * .7, 480 * .7
         center_x: root.width * .5
-        center_y: root.height * .5
+        center_y: root.height * .55
+
     Label:
         id: textLookTime
+        center_x: root.width * .5
+        center_y: root.height - 80
+        font_size: 35
+
+    ToggleButton:
+        id: btnStart
+        center_y: 180
+        center_x: root.width * .5
+        height: 50
+        width: 150
+        on_press: root.detect_toggle()
+        text: "START"
+
+    Label:
+        id: statusRisk
+        center_x: root.width * .5
+        center_y: 100
+        font_size: 25
+        halign: 'center'
+
+    Label:
+        id: textProtect
+        center_x: root.width *.5
+        center_y: 60
+        font_size: 18
+        halign: 'center'
+
+
+
+
