@@ -34,13 +34,24 @@ class CalculationTime:
         self.msgPopup = "Your gaze at the screen for"
         self.statusNormal = "Your eyes are normal."
         self.popProtect = ""
+        self.turnOn = ""
 
-    def callFrame(self, frame):
+    def callFrame(self, frame, turnOn, model):
         self.frame = frame
+        self.turnOn = turnOn
+        self.model = model
 
-    def facedDetect(self, model):
+        if self.turnOn:
+            self.facedDetect()
+            self.drawFace()
+            self.statusFace()
+        else:
+            self.resetValue()
+
+
+    def facedDetect(self):
         gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-        self.face = model.detectMultiScale(gray, 1.3, 5)
+        self.face = self.model.detectMultiScale(gray, 1.3, 5)
 
     def drawFace(self):
         for x, y, w, h in self.face:
@@ -83,11 +94,21 @@ class CalculationTime:
             self.popUpStatus = self.statusNormal
             self.popProtect = ""
 
+    def resetValue(self):
+        self.lookCom = 0
+        self.noLookCom = 0
+        self.startNoFace = time.time()
+        self.startFace = time.time()
+        self.timeLook = ""
+        self.popUpStatus = ""
+        self.popProtect = ""
+
     def getTimeLook(self):
         return self.timeLook
 
     def getStatusText(self):
         return self.popUpStatus, self.popProtect
+
 
 
 _CalculationTime = CalculationTime()
@@ -105,6 +126,8 @@ class FrameToKivy(Image):
         image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
         self.texture = image_texture
 
+class UIBtn(Widget):
+    pass
 
 class Main(Widget):
     frameToKivy = ObjectProperty(None)
@@ -112,29 +135,29 @@ class Main(Widget):
     statusRisk = ObjectProperty(None)
     textProtect = ObjectProperty(None)
     btnStart = ObjectProperty(None)
+    lineRectangle = ObjectProperty(None)
 
 
     def __init__(self, cap, **kwargs):
         super(Main, self).__init__(**kwargs)
         self.cap = cap
         self.output = self.frameToKivy
+        self.turnOn = False
+
 
     def detect_toggle(self):
         click = self.btnStart.state == "down"
+
         if click:
             self.btnStart.text = "STOP"
-            # self.x = 1
+            self.turnOn = True
         else:
             self.btnStart.text = "START"
-            # self.x = 0
+            self.turnOn = False
 
     def update(self, dt):
         frame = self.cap.read()[1]  # <<< start frame app
-
-        _CalculationTime.callFrame(frame)
-        _CalculationTime.facedDetect(faceModel)
-        _CalculationTime.drawFace()
-        _CalculationTime.statusFace()
+        _CalculationTime.callFrame(frame, self.turnOn, faceModel)
 
         self.textLookTime.text = _CalculationTime.getTimeLook()
         self.statusRisk.text = _CalculationTime.getStatusText()[0]
@@ -152,8 +175,13 @@ class EyeBreakApp(App):
     def build(self):
         self.cap = cv2.VideoCapture(0)
         app = Main(self.cap)
+
+        # app.add_widget(UIBtn())  # *******
+
         Clock.schedule_interval(app.update, 1 / 30)
         self.icon = 'graphic/icon_eye_break.png'
+        self.background_color = (0, 0, 0, 0)
+
         return app
 
     def on_stop(self):

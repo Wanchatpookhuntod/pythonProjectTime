@@ -1,10 +1,48 @@
 <FrameToKivy>:
+
+<UIBtn>:
+    canvas:
+        RoundedRectangle:
+            size: 200, 50
+            radius: 25, 25, 25, 25
+
+            pos: root.width * .5 - 100 , root.height * .5
+    Label:
+        text: "hello world"
+        color: 1,1,1,1
+        center_x: root.width * .5
+        center_y: self.height *.75
+
+
+
 <Main>:
     frameToKivy: frameToKivy
     textLookTime: textLookTime
     statusRisk: statusRisk
     textProtect:textProtect
     btnStart: btnStart
+    #:set violet (106/255, 0/255, 255/255, 1)
+
+    canvas.before:
+
+        Color:
+            rgb: 0, 0, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    canvas:
+        Color:
+            rgba: violet
+        Line:
+            width: 1
+            cap: 'none'
+            points: self.pos[0], 205, 640 * .7, 205
+
+    UIBtn:
+        id: uiBtn
+        width: root.width
+
 
     FrameToKivy:
         id: frameToKivy
@@ -12,11 +50,15 @@
         center_x: root.width * .5
         center_y: root.height * .55
 
+
+
     Label:
         id: textLookTime
         center_x: root.width * .5
         center_y: root.height - 80
         font_size: 35
+        color: violet
+
 
     ToggleButton:
         id: btnStart
@@ -33,6 +75,7 @@
         center_y: 100
         font_size: 25
         halign: 'center'
+        color: violet
 
     Label:
         id: textProtect
@@ -40,6 +83,7 @@
         center_y: 60
         font_size: 18
         halign: 'center'
+        color: violet
 
 
 
