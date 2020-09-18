@@ -1,19 +1,5 @@
 <FrameToKivy>:
 
-<UIBtn>:
-    canvas:
-        RoundedRectangle:
-            size: 200, 50
-            radius: 25, 25, 25, 25
-
-            pos: root.width * .5 - 100 , root.height * .5
-    Label:
-        text: "hello world"
-        color: 1,1,1,1
-        center_x: root.width * .5
-        center_y: self.height *.75
-
-
 
 <Main>:
     frameToKivy: frameToKivy
@@ -25,11 +11,12 @@
 
     canvas.before:
 
-        Color:
-            rgb: 0, 0, 0
+#        Color:
+#            rgb: 1,1,1
         Rectangle:
             pos: self.pos
             size: self.size
+            source:'res/bg_1.png'
 
     canvas:
         Color:
@@ -39,9 +26,7 @@
             cap: 'none'
             points: self.pos[0], 205, 640 * .7, 205
 
-    UIBtn:
-        id: uiBtn
-        width: root.width
+
 
 
     FrameToKivy:
@@ -60,14 +45,6 @@
         color: violet
 
 
-    ToggleButton:
-        id: btnStart
-        center_y: 180
-        center_x: root.width * .5
-        height: 50
-        width: 150
-        on_press: root.detect_toggle()
-        text: "START"
 
     Label:
         id: statusRisk
@@ -84,6 +61,19 @@
         font_size: 18
         halign: 'center'
         color: violet
+
+    ToggleButton:
+        id: btnStart
+        background_normal: 'res/btn_1.png'
+        background_down: 'res/btn_2.png'
+        height: 50
+        width: 200
+        center_x: root.width * .5
+        center_y: 150
+        text: "START"
+        on_press: root.detect_toggle()
+
+
 
 
 

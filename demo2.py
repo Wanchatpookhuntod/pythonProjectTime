@@ -13,6 +13,8 @@ from win10toast import ToastNotifier
 faceModel = cv2.CascadeClassifier('res/haarcascade_frontalface_default.xml')
 toaster = ToastNotifier()
 
+
+
 Window.size = (640 * .7, 680)
 
 class CalculationTime:
@@ -144,6 +146,8 @@ class Main(Widget):
         self.output = self.frameToKivy
         self.turnOn = False
 
+    def t(self):
+        print("a;ljlfjlajf")
 
     def detect_toggle(self):
         click = self.btnStart.state == "down"
