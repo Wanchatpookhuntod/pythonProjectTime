@@ -1,80 +1,92 @@
 <FrameToKivy>:
 
+<TabFoot>:
+    canvas:
+        Rectangle:
+            size: 448,30
+            source: 'graphic/tab_foot.png'
+<TabValue>:
+    canvas:
+        Rectangle:
+            size: 436, 161
+            pos: 7, 56
+            source: 'graphic/tab_status.png'
 
 <Main>:
     frameToKivy: frameToKivy
     textLookTime: textLookTime
-    statusRisk: statusRisk
-    textProtect:textProtect
+    textStatusRisk: textStatusRisk
+    textGaze: textGaze
     btnStart: btnStart
+    tabValue : tabValue
+
     #:set violet (106/255, 0/255, 255/255, 1)
+    #:set wWindow 640*.7
+    #:set hWindow 680
+    #:set fontColor (42/255, 38/255, 38/255, 1)
 
     canvas.before:
-
-#        Color:
-#            rgb: 1,1,1
-        Rectangle:
-            pos: self.pos
-            size: self.size
-            source:'res/bg_1.png'
-
-    canvas:
         Color:
-            rgba: violet
-        Line:
-            width: 1
-            cap: 'none'
-            points: self.pos[0], 205, 640 * .7, 205
+            rgb: 228/255, 228/255, 228/255
 
-
-
+        Rectangle:
+            size: self.size
 
     FrameToKivy:
         id: frameToKivy
         size: 640 * .7, 480 * .7
-        center_x: root.width * .5
-        center_y: root.height * .55
+        pos: 0, 680 - (480 * .7)
 
-
-
-    Label:
-        id: textLookTime
-        center_x: root.width * .5
-        center_y: root.height - 80
-        font_size: 35
-        color: violet
-
-
-
-    Label:
-        id: statusRisk
-        center_x: root.width * .5
-        center_y: 100
-        font_size: 25
-        halign: 'center'
-        color: violet
-
-    Label:
-        id: textProtect
-        center_x: root.width *.5
-        center_y: 60
-        font_size: 18
-        halign: 'center'
-        color: violet
-
+#    Widget:
+#        id: d
+#        canvas:
+#
     ToggleButton:
         id: btnStart
-        background_normal: 'res/btn_1.png'
-        background_down: 'res/btn_2.png'
-        height: 50
-        width: 200
-        center_x: root.width * .5
-        center_y: 150
-        text: "START"
+        background_normal: 'graphic/btn_start.png'
+        background_down: 'graphic/btn_stop.png'
+        height: 138
+        width: 138
+        pos: (wWindow/2) - (132/2), 156
         on_press: root.detect_toggle()
 
+    TabFoot:
+        pos: 0, 0
+
+    TabValue:
+        id: tabValue
 
 
+        Label:
+            id: textModel
+            font_size: 16
+            center_x: root.width * .5
+            center_y: 182
+            color: fontColor
 
+
+        Label:
+            id: textStatusRisk
+            bold: True
+            color: fontColor
+            center_x: 84
+            center_y: 104
+            font_size: 20
+
+        Label:
+            id: textLookTime
+            bold: True
+            color: fontColor
+            center_x: 237
+            center_y: 104
+            font_size: 20
+
+        Label:
+            id: textGaze
+            bold: True
+            color: fontColor
+            center_x: 380
+            center_y: 104
+            font_size: 20
 
 

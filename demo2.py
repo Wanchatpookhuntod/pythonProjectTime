@@ -32,9 +32,10 @@ class CalculationTime:
         self.breakHour = 2
         self.timeLook = ""
         self.popUpStatus = ""
-        self.titlePopup = "Eye Risk !!!"
+        self.statusRisk = True
+        self.titlePopup = "EYE RISK"
         self.msgPopup = "Your gaze at the screen for"
-        self.statusNormal = "Your eyes are normal."
+        self.statusNormal = "NORMAL"
         self.popProtect = ""
         self.turnOn = ""
 
@@ -83,7 +84,7 @@ class CalculationTime:
             print("Pop up 15 sec.")
 
         if self.lookSecond > 10:
-            toaster.show_toast(title=self.titlePopup,
+            toaster.show_toast(title=f"{self.titlePopup} !!!",
                                msg=f"{self.msgPopup} {self.timeLook} .\n"
                                    f"So you should rest your eyes for 15 seconds..",
                                icon_path="graphic/icon.ico",
@@ -92,9 +93,11 @@ class CalculationTime:
 
             self.popUpStatus = self.titlePopup
             self.popProtect = "So you should rest your eyes for 15 seconds..."
+            self.statusRisk = False
         else:
             self.popUpStatus = self.statusNormal
             self.popProtect = ""
+            self.statusRisk = True
 
     def resetValue(self):
         self.lookCom = 0
@@ -104,6 +107,7 @@ class CalculationTime:
         self.timeLook = ""
         self.popUpStatus = ""
         self.popProtect = ""
+        self.status = ""
 
     def getTimeLook(self):
         return self.timeLook
@@ -111,7 +115,8 @@ class CalculationTime:
     def getStatusText(self):
         return self.popUpStatus, self.popProtect
 
-
+    def getStatusFace(self):
+        return self.status
 
 _CalculationTime = CalculationTime()
 Builder.load_file("gui.kv")
@@ -128,16 +133,19 @@ class FrameToKivy(Image):
         image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
         self.texture = image_texture
 
-class UIBtn(Widget):
+class TabFoot(Widget):
+    pass
+
+class TabValue(Widget):
     pass
 
 class Main(Widget):
     frameToKivy = ObjectProperty(None)
     textLookTime = ObjectProperty(None)
-    statusRisk = ObjectProperty(None)
-    textProtect = ObjectProperty(None)
+    textStatusRisk = ObjectProperty(None)
+    textGaze = ObjectProperty(None)
     btnStart = ObjectProperty(None)
-    lineRectangle = ObjectProperty(None)
+    tabValue = ObjectProperty(None)
 
 
     def __init__(self, cap, **kwargs):
@@ -145,27 +153,24 @@ class Main(Widget):
         self.cap = cap
         self.output = self.frameToKivy
         self.turnOn = False
-
-    def t(self):
-        print("a;ljlfjlajf")
+        self.remove_widget(self.tabValue)
 
     def detect_toggle(self):
         click = self.btnStart.state == "down"
-
-        if click:
-            self.btnStart.text = "STOP"
-            self.turnOn = True
-        else:
-            self.btnStart.text = "START"
-            self.turnOn = False
+        self.turnOn = True if click else False
 
     def update(self, dt):
         frame = self.cap.read()[1]  # <<< start frame app
         _CalculationTime.callFrame(frame, self.turnOn, faceModel)
 
+        if self.turnOn:
+            self.add_widget(self.tabValue)
+        else:
+            self.remove_widget(self.tabValue)
+
         self.textLookTime.text = _CalculationTime.getTimeLook()
-        self.statusRisk.text = _CalculationTime.getStatusText()[0]
-        self.textProtect.text = _CalculationTime.getStatusText()[1]
+        self.textStatusRisk.text = _CalculationTime.getStatusText()[0]
+        self.textGaze.text = str(_CalculationTime.getStatusFace())
 
         self.output.outputFrame(frame)
 
@@ -179,8 +184,6 @@ class EyeBreakApp(App):
     def build(self):
         self.cap = cv2.VideoCapture(0)
         app = Main(self.cap)
-
-        # app.add_widget(UIBtn())  # *******
 
         Clock.schedule_interval(app.update, 1 / 30)
         self.icon = 'graphic/icon_eye_break.png'
