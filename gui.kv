@@ -1,16 +1,6 @@
 <FrameToKivy>:
 
-<TabFoot>:
-    canvas:
-        Rectangle:
-            size: 448,30
-            source: 'graphic/tab_foot.png'
-<TabValue>:
-    canvas:
-        Rectangle:
-            size: 436, 161
-            pos: 7, 56
-            source: 'graphic/tab_status.png'
+
 
 <Main>:
     frameToKivy: frameToKivy
@@ -19,6 +9,12 @@
     textGaze: textGaze
     btnStart: btnStart
     tabValue : tabValue
+    textModel: textModel
+    panelModel: panelModel
+    btnMenu: btnMenu
+    widgetBtnMenu: widgetBtnMenu
+    panelMenu: panelMenu
+    modeBTN: modeBTN
 
     #:set violet (106/255, 0/255, 255/255, 1)
     #:set wWindow 640*.7
@@ -32,45 +28,45 @@
         Rectangle:
             size: self.size
 
+
+
     FrameToKivy:
         id: frameToKivy
         size: 640 * .7, 480 * .7
         pos: 0, 680 - (480 * .7)
 
-#    Widget:
-#        id: d
-#        canvas:
-#
     ToggleButton:
         id: btnStart
         background_normal: 'graphic/btn_start.png'
         background_down: 'graphic/btn_stop.png'
         height: 138
         width: 138
-        pos: (wWindow/2) - (132/2), 156
+        center_x: root.width * .5
+        center_y: 200
         on_press: root.detect_toggle()
 
-    TabFoot:
-        pos: 0, 0
-
-    TabValue:
+    Widget:
         id: tabValue
-
+        canvas:
+            Rectangle:
+                size: 436, 161
+                pos: 7, 36
+                source: 'graphic/tab_status.png'
 
         Label:
             id: textModel
             font_size: 16
             center_x: root.width * .5
-            center_y: 182
+            center_y: 160
             color: fontColor
-
+            text: "HAAR"
 
         Label:
             id: textStatusRisk
             bold: True
             color: fontColor
             center_x: 84
-            center_y: 104
+            center_y: 84
             font_size: 20
 
         Label:
@@ -78,7 +74,7 @@
             bold: True
             color: fontColor
             center_x: 237
-            center_y: 104
+            center_y: 84
             font_size: 20
 
         Label:
@@ -86,7 +82,135 @@
             bold: True
             color: fontColor
             center_x: 380
-            center_y: 104
+            center_y: 84
             font_size: 20
 
+    Widget:
+        id: tabFoot
+        canvas:
+            Rectangle:
+                size: 448,30
+                source: 'graphic/tab_foot.png'
 
+    Widget:
+        id: widgetBtnMenu
+        ToggleButton:
+            id: btnMenu
+            size: 27, 20
+            pos: 20, 640
+            background_normal: 'graphic/btn_menu.png'
+            background_down: 'graphic/btn_menu_down.png'
+            on_press: root.uiMenuToggle()
+
+    Widget:
+        id: panelModel
+
+        Button:
+            id: panelHAAR
+            size: 449, 53
+            background_normal: 'graphic/RectMenu.png'
+            background_down: 'graphic/RectMenu.png'
+            pos: 0, 680-53
+            text: "HAAR"
+            color: violet
+            on_press: root.uiBtnPanelModel()
+            on_press: root.nameModel = "HAAR"
+
+        Button:
+            id: panelHOG
+            size: 449, 53
+            background_normal: 'graphic/RectMenu.png'
+            background_down: 'graphic/RectMenu.png'
+            pos: 0, 680-53*2
+            text: "HOG"
+            color: violet
+            on_press: root.uiBtnPanelModel()
+            on_press: root.nameModel = "HOG"
+
+        Button:
+            id: panelDNN
+            size: 449, 53
+            background_normal: 'graphic/RectMenu.png'
+            background_down: 'graphic/RectMenu.png'
+            pos: 0, 680-53*3
+            text: "DNN"
+            color: violet
+            on_press: root.uiBtnPanelModel()
+            on_press: root.nameModel = "DNN"
+
+
+        Button:
+            id: panelYOLO
+            size: 449, 53
+            background_normal: 'graphic/RectMenu.png'
+            background_down: 'graphic/RectMenu.png'
+            pos: 0, 680-53*4
+            text: "YOLO"
+            color: violet
+            on_press: root.uiBtnPanelModel()
+            on_press: root.nameModel = "YOLO"
+
+
+
+#    Widget:
+#        id: panelMenu
+
+    BoxLayout:
+        id: panelMenu
+        size: 134,130
+        pos: 20, 680-(50+130)
+        orientation: "vertical"
+
+        Button:
+            id: modeBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "Model"
+            color: violet
+            bold: True
+            on_press: root.uiModeModel()
+
+        LineInBOX:
+            size_hint_y: .015
+
+        Button:
+            id: ecoBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "ECO Mode"
+            color: violet
+            bold: True
+
+
+        LineInBOX:
+            size_hint_y: .015
+
+        Button:
+            id: helpBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "Help"
+            color: violet
+            bold: True
+
+<LineInBOX>:
+    canvas:
+        Color:
+            rgba: 0,0,0,.6
+        Rectangle:
+            pos: self.pos
+            size: 134, 1.2
+
+<PanelModel>:
+    canvas.before:
+        Rectangle:
+            pos: 16, 55
+            size:600, 416
+            source: "graphic/panelBig.png"
+
+<BtnModeModel>:
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: 253, 53
+            source: "graphic/bgBtnModelDown.png"

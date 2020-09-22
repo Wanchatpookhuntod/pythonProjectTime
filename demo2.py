@@ -133,10 +133,13 @@ class FrameToKivy(Image):
         image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
         self.texture = image_texture
 
-class TabFoot(Widget):
+class LineInBOX(Widget):
     pass
 
-class TabValue(Widget):
+class PanelModel(Widget):
+    pass
+
+class BtnModeModel(Widget):
     pass
 
 class Main(Widget):
@@ -146,14 +149,23 @@ class Main(Widget):
     textGaze = ObjectProperty(None)
     btnStart = ObjectProperty(None)
     tabValue = ObjectProperty(None)
-
+    textModel = ObjectProperty(None)
+    panelModel = ObjectProperty(None)
+    btnMenu = ObjectProperty(None)
+    widgetBtnMenu = ObjectProperty(None)
+    panelMenu = ObjectProperty(None)
+    modeBTN = ObjectProperty(None)
 
     def __init__(self, cap, **kwargs):
         super(Main, self).__init__(**kwargs)
         self.cap = cap
         self.output = self.frameToKivy
         self.turnOn = False
-        self.remove_widget(self.tabValue)
+        self.menuOn = False
+        self.remove_widget(self.panelModel)
+        self.nameModel = "HAAR"
+        self.remove_widget(self.panelMenu)
+
 
     def detect_toggle(self):
         click = self.btnStart.state == "down"
@@ -163,20 +175,55 @@ class Main(Widget):
         frame = self.cap.read()[1]  # <<< start frame app
         _CalculationTime.callFrame(frame, self.turnOn, faceModel)
 
-        if self.turnOn:
-            self.add_widget(self.tabValue)
-        else:
-            self.remove_widget(self.tabValue)
+        self.uiStart()
 
         self.textLookTime.text = _CalculationTime.getTimeLook()
         self.textStatusRisk.text = _CalculationTime.getStatusText()[0]
         self.textGaze.text = str(_CalculationTime.getStatusFace())
-
+        self.textNameModel()
         self.output.outputFrame(frame)
 
         if Window.size[0] < 640 * .7 or Window.size[1] < 680 or \
                 Window.size[0] > 640 * .7 or Window.size[1] > 680:
             Window.size = (640 * .7, 680)
+
+    def uiStart(self):
+        self.uiTurnOff()
+
+        if self.turnOn:
+            self.uiTurnOn()
+
+    def uiTurnOn(self):
+        self.add_widget(self.tabValue)
+        self.btnStart.center_y = 262
+
+    def uiTurnOff(self):
+        self.remove_widget(self.tabValue)
+        self.btnStart.center_y = 200
+
+    def uiMenu(self):
+        if self.menuOn:
+            self.add_widget(self.panelMenu)
+        else:
+            self.remove_widget(self.panelMenu)
+
+    def uiMenuToggle(self):
+        click = self.btnMenu.state == "down"
+        self.menuOn = True if click else False
+        self.uiMenu()
+
+    def uiBtnPanelModel(self):
+        self.remove_widget(self.panelModel)
+        self.add_widget(self.widgetBtnMenu)
+
+    def textNameModel(self):
+        if self.nameModel:
+            self.textModel.text = self.nameModel
+
+    def uiModeModel(self):
+        self.add_widget(self.panelModel)
+        self.remove_widget(self.widgetBtnMenu)
+        self.remove_widget(self.panelMenu)
 
 
 class EyeBreakApp(App):
@@ -184,16 +231,13 @@ class EyeBreakApp(App):
     def build(self):
         self.cap = cv2.VideoCapture(0)
         app = Main(self.cap)
-
         Clock.schedule_interval(app.update, 1 / 30)
         self.icon = 'graphic/icon_eye_break.png'
         self.background_color = (0, 0, 0, 0)
-
         return app
 
     def on_stop(self):
         self.cap.release()
-
 
 if __name__ == '__main__':
     EyeBreakApp().run()
