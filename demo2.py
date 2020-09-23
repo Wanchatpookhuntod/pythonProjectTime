@@ -1,5 +1,7 @@
 from kivy.app import App
 from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.uix.togglebutton import ToggleButton
 from kivy.core.window import Window
 from kivy.uix.image import Image
 from kivy.clock import Clock
@@ -9,6 +11,7 @@ from kivy.lang.builder import Builder
 import cv2
 import time
 from win10toast import ToastNotifier
+from functools import partial
 
 faceModel = cv2.CascadeClassifier('res/haarcascade_frontalface_default.xml')
 toaster = ToastNotifier()
@@ -118,9 +121,10 @@ class CalculationTime:
     def getStatusFace(self):
         return self.status
 
+# GUI ============================
+
 _CalculationTime = CalculationTime()
 Builder.load_file("gui.kv")
-
 
 class FrameToKivy(Image):
 
@@ -136,10 +140,10 @@ class FrameToKivy(Image):
 class LineInBOX(Widget):
     pass
 
-class PanelModel(Widget):
+class MenuPanelModel(Widget):
     pass
 
-class BtnModeModel(Widget):
+class BtnModeModel(ToggleButton):
     pass
 
 class Main(Widget):
@@ -150,11 +154,18 @@ class Main(Widget):
     btnStart = ObjectProperty(None)
     tabValue = ObjectProperty(None)
     textModel = ObjectProperty(None)
-    panelModel = ObjectProperty(None)
     btnMenu = ObjectProperty(None)
     widgetBtnMenu = ObjectProperty(None)
-    panelMenu = ObjectProperty(None)
+    menu = ObjectProperty(None)
     modeBTN = ObjectProperty(None)
+    menuPanelModel = ObjectProperty(None)
+    btnHAAR = ObjectProperty(None)
+    btnHOG = ObjectProperty(None)
+    btnDNN = ObjectProperty(None)
+    btnYOLO = ObjectProperty(None)
+
+
+
 
     def __init__(self, cap, **kwargs):
         super(Main, self).__init__(**kwargs)
@@ -162,30 +173,15 @@ class Main(Widget):
         self.output = self.frameToKivy
         self.turnOn = False
         self.menuOn = False
-        self.remove_widget(self.panelModel)
+        # self.remove_widget(self.panelModel)
         self.nameModel = "HAAR"
-        self.remove_widget(self.panelMenu)
-
+        self.remove_widget(self.menu)
+        self.remove_widget(self.menuPanelModel)
+        self.modelActive = 0
 
     def detect_toggle(self):
         click = self.btnStart.state == "down"
         self.turnOn = True if click else False
-
-    def update(self, dt):
-        frame = self.cap.read()[1]  # <<< start frame app
-        _CalculationTime.callFrame(frame, self.turnOn, faceModel)
-
-        self.uiStart()
-
-        self.textLookTime.text = _CalculationTime.getTimeLook()
-        self.textStatusRisk.text = _CalculationTime.getStatusText()[0]
-        self.textGaze.text = str(_CalculationTime.getStatusFace())
-        self.textNameModel()
-        self.output.outputFrame(frame)
-
-        if Window.size[0] < 640 * .7 or Window.size[1] < 680 or \
-                Window.size[0] > 640 * .7 or Window.size[1] > 680:
-            Window.size = (640 * .7, 680)
 
     def uiStart(self):
         self.uiTurnOff()
@@ -203,28 +199,85 @@ class Main(Widget):
 
     def uiMenu(self):
         if self.menuOn:
-            self.add_widget(self.panelMenu)
+            self.add_widget(self.menu)
         else:
-            self.remove_widget(self.panelMenu)
+            self.remove_widget(self.menu)
 
     def uiMenuToggle(self):
         click = self.btnMenu.state == "down"
         self.menuOn = True if click else False
         self.uiMenu()
 
-    def uiBtnPanelModel(self):
-        self.remove_widget(self.panelModel)
+    def btnModel(self):
+        self.remove_widget(self.menu)
         self.add_widget(self.widgetBtnMenu)
+
 
     def textNameModel(self):
         if self.nameModel:
             self.textModel.text = self.nameModel
 
     def uiModeModel(self):
-        self.add_widget(self.panelModel)
+        self.add_widget(self.menuPanelModel)
         self.remove_widget(self.widgetBtnMenu)
-        self.remove_widget(self.panelMenu)
+        self.remove_widget(self.menu)
 
+    def onPressActiveModel(self, x):
+        self.modelActive = x
+
+    def dis(self):
+        if self.closeMenu:
+            self.add_widget(self.menu)
+
+    def swapActiveBtnModel(self, model, down, nor1, nor2, nor3):
+        if down.state == "down":
+            down.state = "down"
+            nor1.state = "normal"
+            nor2.state = "normal"
+            nor3.state = "normal"
+            self.nameModel = model
+            self.textNameModel()
+            self.remove_widget(self.menuPanelModel)
+            self.uiMenu()
+
+
+    def btnModelTask(self):
+        self.btnHAAR.on_press = partial(self.onPressActiveModel, x=1)
+        self.btnHOG.on_press = partial(self.onPressActiveModel, x=2)
+        self.btnDNN.on_press = partial(self.onPressActiveModel, x=3)
+        self.btnYOLO.on_press = partial(self.onPressActiveModel, x=4)
+
+        if self.modelActive == 1:
+            self.swapActiveBtnModel("HAAR", self.btnHAAR, self.btnHOG, self.btnDNN, self.btnYOLO)
+            self.add_widget(self.menu)
+
+        elif self.modelActive == 2:
+            self.swapActiveBtnModel("HOG", self.btnHOG, self.btnDNN, self.btnYOLO, self.btnHAAR)
+
+        elif self.modelActive == 3:
+            self.swapActiveBtnModel("DNN", self.btnDNN, self.btnYOLO, self.btnHAAR, self.btnHOG)
+
+        elif self.modelActive == 4:
+            self.swapActiveBtnModel("YOLO", self.btnYOLO, self.btnHAAR, self.btnHOG, self.btnDNN)
+        else:
+            pass
+
+    def update(self, dt):
+        frame = self.cap.read()[1]  # <<< start frame app
+        _CalculationTime.callFrame(frame, self.turnOn, faceModel)
+
+        self.uiStart()
+        self.btnModelTask()
+
+        self.textLookTime.text = _CalculationTime.getTimeLook()
+        self.textStatusRisk.text = _CalculationTime.getStatusText()[0]
+        self.textGaze.text = str(_CalculationTime.getStatusFace())
+        self.textNameModel()
+        self.output.outputFrame(frame)
+
+        if Window.size[0] < 640 * .7 or Window.size[1] < 680 or \
+                Window.size[0] > 640 * .7 or Window.size[1] > 680:
+            Window.size = (640 * .7, 680)
 
 class EyeBreakApp(App):
 

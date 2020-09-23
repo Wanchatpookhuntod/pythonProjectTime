@@ -10,17 +10,27 @@
     btnStart: btnStart
     tabValue : tabValue
     textModel: textModel
-    panelModel: panelModel
+#    panelModel: panelModel
     btnMenu: btnMenu
     widgetBtnMenu: widgetBtnMenu
-    panelMenu: panelMenu
-    modeBTN: modeBTN
+    menu: menu
+    menuPanelModel: menuPanelModel
+    btnHAAR: menuPanelModel.btnHAAR
+    btnHOG: menuPanelModel.btnHOG
+    btnDNN: menuPanelModel.btnDNN
+    btnYOLO: menuPanelModel.btnYOLO
+
+
+
+
+
+#    modeBTN: modeBTN
 
     #:set violet (106/255, 0/255, 255/255, 1)
     #:set wWindow 640*.7
     #:set hWindow 680
     #:set fontColor (42/255, 38/255, 38/255, 1)
-
+    id: main
     canvas.before:
         Color:
             rgb: 228/255, 228/255, 228/255
@@ -102,66 +112,13 @@
             background_down: 'graphic/btn_menu_down.png'
             on_press: root.uiMenuToggle()
 
-    Widget:
-        id: panelModel
-
-        Button:
-            id: panelHAAR
-            size: 449, 53
-            background_normal: 'graphic/RectMenu.png'
-            background_down: 'graphic/RectMenu.png'
-            pos: 0, 680-53
-            text: "HAAR"
-            color: violet
-            on_press: root.uiBtnPanelModel()
-            on_press: root.nameModel = "HAAR"
-
-        Button:
-            id: panelHOG
-            size: 449, 53
-            background_normal: 'graphic/RectMenu.png'
-            background_down: 'graphic/RectMenu.png'
-            pos: 0, 680-53*2
-            text: "HOG"
-            color: violet
-            on_press: root.uiBtnPanelModel()
-            on_press: root.nameModel = "HOG"
-
-        Button:
-            id: panelDNN
-            size: 449, 53
-            background_normal: 'graphic/RectMenu.png'
-            background_down: 'graphic/RectMenu.png'
-            pos: 0, 680-53*3
-            text: "DNN"
-            color: violet
-            on_press: root.uiBtnPanelModel()
-            on_press: root.nameModel = "DNN"
-
-
-        Button:
-            id: panelYOLO
-            size: 449, 53
-            background_normal: 'graphic/RectMenu.png'
-            background_down: 'graphic/RectMenu.png'
-            pos: 0, 680-53*4
-            text: "YOLO"
-            color: violet
-            on_press: root.uiBtnPanelModel()
-            on_press: root.nameModel = "YOLO"
-
-
-
-#    Widget:
-#        id: panelMenu
-
     BoxLayout:
-        id: panelMenu
+        id: menu
         size: 134,130
         pos: 20, 680-(50+130)
         orientation: "vertical"
 
-        Button:
+        ToggleButton:
             id: modeBTN
             background_normal: 'graphic/btNormal.png'
             background_down: 'graphic/btDown.png'
@@ -173,7 +130,7 @@
         LineInBOX:
             size_hint_y: .015
 
-        Button:
+        ToggleButton:
             id: ecoBTN
             background_normal: 'graphic/btNormal.png'
             background_down: 'graphic/btDown.png'
@@ -181,17 +138,20 @@
             color: violet
             bold: True
 
-
         LineInBOX:
             size_hint_y: .015
 
-        Button:
+        ToggleButton:
             id: helpBTN
             background_normal: 'graphic/btNormal.png'
             background_down: 'graphic/btDown.png'
             text: "Help"
             color: violet
             bold: True
+
+    MenuPanelModel:
+        id: menuPanelModel
+
 
 <LineInBOX>:
     canvas:
@@ -201,16 +161,54 @@
             pos: self.pos
             size: 134, 1.2
 
-<PanelModel>:
+<MenuPanelModel>:
+
+    btnHAAR: btnHAAR
+    btnHOG: btnHOG
+    btnDNN: btnDNN
+    btnYOLO: btnYOLO
+
+    id: bgPanelModel
+    pos: 16, 205
     canvas.before:
         Rectangle:
-            pos: 16, 55
-            size:600, 416
+            pos: bgPanelModel.pos
+            size:416, 450
             source: "graphic/panelBig.png"
 
+    BoxLayout:
+        pos: 109, 264
+        orientation: "vertical"
+        size: 230, 240
+        spacing: 12
+
+        BtnModeModel:
+            id: btnHAAR
+            text: "HAAR"
+
+        BtnModeModel:
+            id: btnHOG
+            text: "HOG"
+
+
+        BtnModeModel:
+            id: btnDNN
+            text: "DNN"
+
+        BtnModeModel:
+            id: btnYOLO
+            text: "YOLO"
+
+
 <BtnModeModel>:
-    canvas:
-        Rectangle:
-            pos: self.pos
-            size: 253, 53
-            source: "graphic/bgBtnModelDown.png"
+    size: 230, 50
+    background_normal: "graphic/bgBtnModelNormal.png"
+    background_down: "graphic/bgBtnModelDown.png"
+    color: violet
+
+
+
+
+
+
+

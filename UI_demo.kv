@@ -1,89 +1,9 @@
-
-
-
-<Main>:
-    #:set fontColor (42/255, 38/255, 38/255, 1)
-
-    canvas.before:
-        Color:
-            rgb: 228/255, 228/255, 228/255
-
-        Rectangle:
-            size: self.size
-
-
-
-    canvas:
-        Color:
-            rgb: 110/255, 0/255, 255/255
-        Line:
-            points: 40,680-465, 448-40, 680-465
-
-    canvas:
-        Rectangle:
-            size: 448,30
-            source: 'graphic/tab_foot.png'
-
-
-
-
-
-
-
-
-    ToggleButton:
-        id: btnStart
-        background_normal: 'graphic/btn_startUI.png'
-        background_down: 'graphic/btn_stop.png'
-        height: 120
-        width: 120
-        center_x: root.width * .5
-        center_y: 290
-
-
-
-
-
-    Label:
-        id: textModel
-        text: "Haar Cascade"
-        font_size: 16
-        center_x: root.width * .5
-        center_y: 165
-        color: fontColor
-
-        canvas.before:
-            Rectangle:
-                size: 416,163.5
-                pos: 16,50
-                source: 'graphic/tab_x.png'
-
-        Label:
-            id: textStatus
-            text: "NORMAL"
-            bold: True
-            color: fontColor
-            center_x: 84
-            center_y: 86
-            font_size: 20
-
-
-        Label:
-            id: textTime
-            bold: True
-            text: "00:00:00"
-            color: fontColor
-            center_x: 237
-            center_y: 86
-            font_size: 20
-
-        Label:
-            id: textGaze
-            text: "TRUE"
-            bold: True
-            color: fontColor
-            center_x: 380
-            center_y: 86
-            font_size: 20
-
-
+FloatLayout:
+    Spinner:
+        size_hint: None, none
+        size: 100, 44
+        pos_hint: {'center': (.5, .5)}
+        text: 'Home'
+        values: 'Home', 'Work', 'Other', 'Custom'
+        on_value:
+            print: "The spinner {} has text {}".format(self, self.value)

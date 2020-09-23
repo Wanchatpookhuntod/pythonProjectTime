@@ -1,44 +1,62 @@
+
+from kivy.uix.button import Button
+from kivy.uix.widget import Widget
+from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
-from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.graphics import Color, Rectangle
+from random import random as r
+from functools import partial
 
-# Create both screens. Please note the root.manager.current: this is how
-# you can control the ScreenManager from kv. Each screen has by default a
-# property manager that gives you the instance of the ScreenManager used.
-Builder.load_string("""
-<MenuScreen>:
-    BoxLayout:
-        Button:
-            text: 'Goto settings'
-            on_press: root.manager.current = 'settings'
-        Button:
-            text: 'Quit'
 
-<SettingsScreen>:
-    BoxLayout:
-        Button:
-            text: 'My settings button'
-        Button:
-            text: 'Back to menu'
-            on_press: root.manager.current = 'menu'
-""")
+class StressCanvasApp(App):
 
-# Declare both screens
-class MenuScreen(Screen):
-    pass
+    def add_rects(self, label, wid, count, *largs):
+        label.text = str(int(label.text) + count)
+        with wid.canvas:
+            for x in range(count):
+                Color(r(), 1, 1, mode='hsv')
+                Rectangle(pos=(r() * wid.width + wid.modelActive,
+                               r() * wid.height + wid.y), size=(20, 20))
 
-class SettingsScreen(Screen):
-    pass
+    def double_rects(self, label, wid, *largs):
+        count = int(label.text)
+        self.add_rects(label, wid, count, *largs)
 
-# Create the screen manager
-sm = ScreenManager()
-sm.add_widget(MenuScreen(name='menu'))
-sm.add_widget(SettingsScreen(name='settings'))
-
-class TestApp(App):
+    def reset_rects(self, label, wid, *largs):
+        label.text = '0'
+        wid.canvas.clear()
 
     def build(self):
-        return sm
+        wid = Widget()
+
+        label = Label(text='0')
+
+        btn_add100 = Button(text='+ 100 rects',
+                            on_press=partial(self.add_rects, label, wid, 100))
+
+        btn_add500 = Button(text='+ 500 rects',
+                            on_press=partial(self.add_rects, label, wid, 500))
+
+        btn_double = Button(text='x 2',
+                            on_press=partial(self.double_rects, label, wid))
+
+        btn_reset = Button(text='Reset',
+                           on_press=partial(self.reset_rects, label, wid))
+
+        layout = BoxLayout(size_hint=(1, None), height=50)
+        layout.add_widget(btn_add100)
+        layout.add_widget(btn_add500)
+        layout.add_widget(btn_double)
+        layout.add_widget(btn_reset)
+        layout.add_widget(label)
+
+        root = BoxLayout(orientation='vertical')
+        root.add_widget(wid)
+        root.add_widget(layout)
+
+        return root
+
 
 if __name__ == '__main__':
-    TestApp().run()
+    StressCanvasApp().run()
