@@ -12,13 +12,13 @@
     textModel: textModel
 #    panelModel: panelModel
     btnMenu: btnMenu
-    widgetBtnMenu: widgetBtnMenu
     menu: menu
     menuPanelModel: menuPanelModel
     btnHAAR: menuPanelModel.btnHAAR
     btnHOG: menuPanelModel.btnHOG
     btnDNN: menuPanelModel.btnDNN
     btnYOLO: menuPanelModel.btnYOLO
+    bgPanelModel: menuPanelModel.bgPanelModel_1
 
 
 
@@ -102,23 +102,22 @@
                 size: 448,30
                 source: 'graphic/tab_foot.png'
 
-    Widget:
-        id: widgetBtnMenu
-        ToggleButton:
-            id: btnMenu
-            size: 27, 20
-            pos: 20, 640
-            background_normal: 'graphic/btn_menu.png'
-            background_down: 'graphic/btn_menu_down.png'
-            on_press: root.uiMenuToggle()
+    ToggleButton:
+        id: btnMenu
+        size: 27, 20
+        pos: 20, 640
+        background_normal: 'graphic/btn_menu.png'
+        background_down: 'graphic/btn_menu_down.png'
+        on_press: root.uiMenuOn()
 
     BoxLayout:
         id: menu
-        size: 134,130
-        pos: 20, 680-(50+130)
+        size: 115,100
+        pos: 20, 680-(150)
         orientation: "vertical"
+        spacing: 2
 
-        ToggleButton:
+        Button:
             id: modeBTN
             background_normal: 'graphic/btNormal.png'
             background_down: 'graphic/btDown.png'
@@ -127,10 +126,7 @@
             bold: True
             on_press: root.uiModeModel()
 
-        LineInBOX:
-            size_hint_y: .015
-
-        ToggleButton:
+        Button:
             id: ecoBTN
             background_normal: 'graphic/btNormal.png'
             background_down: 'graphic/btDown.png'
@@ -138,10 +134,7 @@
             color: violet
             bold: True
 
-        LineInBOX:
-            size_hint_y: .015
-
-        ToggleButton:
+        Button:
             id: helpBTN
             background_normal: 'graphic/btNormal.png'
             background_down: 'graphic/btDown.png'
@@ -151,6 +144,8 @@
 
     MenuPanelModel:
         id: menuPanelModel
+
+
 
 
 <LineInBOX>:
@@ -167,14 +162,17 @@
     btnHOG: btnHOG
     btnDNN: btnDNN
     btnYOLO: btnYOLO
+    bgPanelModel_1: bgPanelModel.bgPanelModel_1
 
     id: bgPanelModel
-    pos: 16, 205
+    pos: 16, 55
     canvas.before:
         Rectangle:
+            id: bgPanelModel_1
+            size:416, 600
             pos: bgPanelModel.pos
-            size:416, 450
             source: "graphic/panelBig.png"
+
 
     BoxLayout:
         pos: 109, 264
@@ -185,6 +183,7 @@
         BtnModeModel:
             id: btnHAAR
             text: "HAAR"
+
 
         BtnModeModel:
             id: btnHOG
@@ -205,7 +204,6 @@
     background_normal: "graphic/bgBtnModelNormal.png"
     background_down: "graphic/bgBtnModelDown.png"
     color: violet
-
 
 
 

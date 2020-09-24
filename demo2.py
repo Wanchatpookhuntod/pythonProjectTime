@@ -121,7 +121,7 @@ class CalculationTime:
     def getStatusFace(self):
         return self.status
 
-# GUI ============================
+# GUI =====================================================
 
 _CalculationTime = CalculationTime()
 Builder.load_file("gui.kv")
@@ -137,8 +137,6 @@ class FrameToKivy(Image):
         image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
         self.texture = image_texture
 
-class LineInBOX(Widget):
-    pass
 
 class MenuPanelModel(Widget):
     pass
@@ -155,7 +153,6 @@ class Main(Widget):
     tabValue = ObjectProperty(None)
     textModel = ObjectProperty(None)
     btnMenu = ObjectProperty(None)
-    widgetBtnMenu = ObjectProperty(None)
     menu = ObjectProperty(None)
     modeBTN = ObjectProperty(None)
     menuPanelModel = ObjectProperty(None)
@@ -163,9 +160,7 @@ class Main(Widget):
     btnHOG = ObjectProperty(None)
     btnDNN = ObjectProperty(None)
     btnYOLO = ObjectProperty(None)
-
-
-
+    bgPanelModel_1 = ObjectProperty(None)
 
     def __init__(self, cap, **kwargs):
         super(Main, self).__init__(**kwargs)
@@ -173,61 +168,36 @@ class Main(Widget):
         self.output = self.frameToKivy
         self.turnOn = False
         self.menuOn = False
-        # self.remove_widget(self.panelModel)
         self.nameModel = "HAAR"
         self.remove_widget(self.menu)
         self.remove_widget(self.menuPanelModel)
         self.modelActive = 0
+        self.showBtnMenuOn = True
+        self.panelModelOn = False
+        self.btnOn = True
 
     def detect_toggle(self):
         click = self.btnStart.state == "down"
         self.turnOn = True if click else False
 
-    def uiStart(self):
-        self.uiTurnOff()
 
-        if self.turnOn:
-            self.uiTurnOn()
 
-    def uiTurnOn(self):
-        self.add_widget(self.tabValue)
-        self.btnStart.center_y = 262
-
-    def uiTurnOff(self):
-        self.remove_widget(self.tabValue)
-        self.btnStart.center_y = 200
-
-    def uiMenu(self):
-        if self.menuOn:
-            self.add_widget(self.menu)
-        else:
-            self.remove_widget(self.menu)
-
-    def uiMenuToggle(self):
+    def uiMenuOn(self):
         click = self.btnMenu.state == "down"
         self.menuOn = True if click else False
-        self.uiMenu()
-
-    def btnModel(self):
-        self.remove_widget(self.menu)
-        self.add_widget(self.widgetBtnMenu)
-
 
     def textNameModel(self):
         if self.nameModel:
             self.textModel.text = self.nameModel
 
     def uiModeModel(self):
-        self.add_widget(self.menuPanelModel)
-        self.remove_widget(self.widgetBtnMenu)
-        self.remove_widget(self.menu)
+        self.menuOn = False
+        self.showBtnMenuOn = False
+        self.panelModelOn = True
+        self.btnOn = False
 
     def onPressActiveModel(self, x):
         self.modelActive = x
-
-    def dis(self):
-        if self.closeMenu:
-            self.add_widget(self.menu)
 
     def swapActiveBtnModel(self, model, down, nor1, nor2, nor3):
         if down.state == "down":
@@ -237,37 +207,78 @@ class Main(Widget):
             nor3.state = "normal"
             self.nameModel = model
             self.textNameModel()
-            self.remove_widget(self.menuPanelModel)
-            self.uiMenu()
 
+    def resetPanelModel(self, instance):
+        self.panelModelOn = False
+        self.showBtnMenuOn = True
+        self.btnOn = True
+        self.btnMenu.state = "normal"
+        self.btnStart.state = "normal"
 
     def btnModelTask(self):
+        self.btnHAAR.bind(on_press=self.resetPanelModel)
         self.btnHAAR.on_press = partial(self.onPressActiveModel, x=1)
+
+        self.btnHOG.bind(on_press=self.resetPanelModel)
         self.btnHOG.on_press = partial(self.onPressActiveModel, x=2)
+
+        self.btnDNN.bind(on_press=self.resetPanelModel)
         self.btnDNN.on_press = partial(self.onPressActiveModel, x=3)
+
+        self.btnYOLO.bind(on_press=self.resetPanelModel)
         self.btnYOLO.on_press = partial(self.onPressActiveModel, x=4)
 
         if self.modelActive == 1:
-            self.swapActiveBtnModel("HAAR", self.btnHAAR, self.btnHOG, self.btnDNN, self.btnYOLO)
-            self.add_widget(self.menu)
+            self.swapActiveBtnModel(self.btnHAAR.text, self.btnHAAR, self.btnHOG, self.btnDNN, self.btnYOLO)
 
         elif self.modelActive == 2:
-            self.swapActiveBtnModel("HOG", self.btnHOG, self.btnDNN, self.btnYOLO, self.btnHAAR)
+            self.swapActiveBtnModel(self.btnHOG.text, self.btnHOG, self.btnDNN, self.btnYOLO, self.btnHAAR)
 
         elif self.modelActive == 3:
-            self.swapActiveBtnModel("DNN", self.btnDNN, self.btnYOLO, self.btnHAAR, self.btnHOG)
+            self.swapActiveBtnModel(self.btnDNN.text, self.btnDNN, self.btnYOLO, self.btnHAAR, self.btnHOG)
 
         elif self.modelActive == 4:
-            self.swapActiveBtnModel("YOLO", self.btnYOLO, self.btnHAAR, self.btnHOG, self.btnDNN)
+            self.swapActiveBtnModel(self.btnYOLO.text, self.btnYOLO, self.btnHAAR, self.btnHOG, self.btnDNN)
         else:
             pass
+
+    def addWidget(self):
+        if self.showBtnMenuOn:
+            self.add_widget(self.btnMenu)
+
+        if self.menuOn:
+            self.add_widget(self.menu)
+
+        if self.panelModelOn:
+            self.add_widget(self.menuPanelModel)
+            self.turnOn = False
+
+
+        if self.btnOn:
+            self.add_widget(self.btnStart)
+
+        if self.turnOn:
+            self.add_widget(self.tabValue)
+            self.btnStart.center_y = 262
+        else:
+            self.btnStart.center_y = 200
+
+    def removeWidget(self):
+        self.remove_widget(self.menu)
+        self.remove_widget(self.btnMenu)
+        self.remove_widget(self.menuPanelModel)
+        self.remove_widget(self.btnStart)
+        self.remove_widget(self.tabValue)
 
     def update(self, dt):
         frame = self.cap.read()[1]  # <<< start frame app
         _CalculationTime.callFrame(frame, self.turnOn, faceModel)
 
-        self.uiStart()
+        self.removeWidget()
+
         self.btnModelTask()
+
+        self.addWidget()
 
         self.textLookTime.text = _CalculationTime.getTimeLook()
         self.textStatusRisk.text = _CalculationTime.getStatusText()[0]
