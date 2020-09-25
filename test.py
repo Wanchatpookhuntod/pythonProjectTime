@@ -1,25 +1,10 @@
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
 
+x = ["a", "b", "c", "d"]
+y = [0, 1, 2, 3]
 
-class TutorialApp(App):
-    def gratulation(self, *args):
-        print(args)
+for j, i in zip(x, y):
+    print(i, j)
 
-    def build(self):
-        boxLayout = BoxLayout(spacing=10,orientation='vertical')
-        g = TextInput(text='Enter gratulation',
-                      multiline=False,
-                      font_size=20,
-                      height=100)
-        button = Button(text='Send')
-        button.bind(on_press=self.gratulation)
+    # if i:
+    #     print(x[i], i)
 
-        boxLayout.add_widget(g)
-        boxLayout.add_widget(button)
-        return boxLayout
-
-if __name__ == "__main__":
-    TutorialApp().run()
