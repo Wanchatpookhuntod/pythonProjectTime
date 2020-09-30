@@ -18,7 +18,7 @@ Window.size = (640 * .7, 680)
 # GUI =====================================================
 
 _CalculationTime = CalculationTime()
-Builder.load_file("gui.kv")
+Builder.load_file("gui2.kv")
 
 
 class FrameToKivy(Image):
@@ -97,7 +97,8 @@ class Main(Widget):
             nor2.state = "normal"
             self.nameModel = model
             self.textNameModel()
-
+        else:
+            pass
 
     def resetPanelModel(self, instance):
         self.panelModelOn = False
@@ -105,7 +106,7 @@ class Main(Widget):
         self.btnOn = True
         self.btnStart.state = "down"
         self.turnOn = True
-        self.menuOn = True
+        self.menuOn = False
         self.btnMenu.state = "normal"
 
 
@@ -130,17 +131,24 @@ class Main(Widget):
         elif self.modelActive == 2:
             self.swapActiveBtnModel(self.btnDNN.text, self.btnDNN, self.btnHAAR, self.btnHOG)
 
+        else:
+            pass
+
     def addWidget(self):
         if self.showBtnMenuOn:
             self.add_widget(self.btnMenu)
 
         if self.menuOn:
-            if self.btnMenu.state == "down":
-                self.add_widget(self.menu)
+            # if self.btnMenu.state == "down":
+            self.add_widget(self.menu)
+        else:
+            pass
 
         if self.panelModelOn:
             self.add_widget(self.menuPanelModel)
             self.turnOn = False
+        else:
+            pass
 
         if self.btnOn:
             self.add_widget(self.btnStart)
@@ -161,13 +169,14 @@ class Main(Widget):
         self.remove_widget(self.menuPanelModel)
         self.remove_widget(self.btnStart)
         self.remove_widget(self.tabValue)
-        # self.remove_widget(self.labelTimeProcess)
+        self.remove_widget(self.labelTimeProcess)
+
+
 
     def update(self, dt):
         frame = self.cap.read()[1]  # <<< start frame app
         _CalculationTime.callFrame(frame, self.turnOn, self.modelActive)
 
-        # print(f"{self.menuOn}, {self.btnMenu.state}")
 
         self.removeWidget()
 

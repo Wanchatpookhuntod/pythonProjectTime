@@ -1,9 +1,154 @@
-FloatLayout:
-    Spinner:
-        size_hint: None, none
-        size: 100, 44
-        pos_hint: {'center': (.5, .5)}
-        text: 'Home'
-        values: 'Home', 'Work', 'Other', 'Custom'
-        on_value:
-            print: "The spinner {} has text {}".format(self, self.value)
+
+<FrameToKivy>:
+
+<Main>:
+    frameToKivy: frameToKivy
+    btnStart: btnStart
+
+#:set violet (106/255, 0/255, 255/255, 1)
+#:set wWindow 640*.7
+#:set hWindow 680
+#:set fontColor (42/255, 38/255, 38/255, 1)
+
+#    BoxLayout:
+#    Button:
+#        text: 'Goto settings'
+#        on_press: root.manager.current = 'settings'
+#        height: 138
+#        width: 138
+#    BoxLayout:
+#        size: 100,100
+#        orientation: "vertical"
+
+    Widget:
+        Button:
+            text: 'Goto settings'
+            on_press: root.manager.current = 'settings'
+    Widget:
+        ToggleButton:
+            id: btnStart
+            background_normal: 'graphic/btn_start.png'
+            background_down: 'graphic/btn_stop.png'
+            height: 138
+            width: 138
+            center_x: root.width * .5
+            center_y: 200
+            on_press: root.detect_toggle()
+
+    Widget
+        FrameToKivy:
+            id: frameToKivy
+            size: 640 * .7, 480 * .7
+            pos: 0, 680 - (480 * .7)
+
+    Widget:
+        id: tabFoot
+        canvas:
+            Rectangle:
+                size: 448,30
+                source: 'graphic/tab_foot.png'
+
+
+
+<TabValue>:
+    textModel: textModel
+    textStatusRisk: textStatusRisk
+    textLookTime: textLookTime
+    textGaze: textGaze
+    labelTimeProcess: labelTimeProcess
+
+    canvas.before:
+        Rectangle:
+            size: 436, 161
+            pos: 7, 36
+            source: 'graphic/tab_value.png'
+
+    Label:
+        id: textModel
+        font_size: 16
+        center_x: root.width * .5
+        center_y: 160
+        color: fontColor
+        text: "HAAR"
+
+    Label:
+        id: textStatusRisk
+        bold: True
+        color: fontColor
+        center_x: 84
+        center_y: 84
+        font_size: 20
+
+    Label:
+        id: textLookTime
+        bold: True
+        color: fontColor
+        center_x: 237
+        center_y: 84
+        font_size: 20
+
+    Label:
+        id: textGaze
+        bold: True
+        color: fontColor
+        center_x: 380
+        center_y: 84
+        font_size: 20
+
+
+    Label:
+        id: labelTimeProcess
+        center_x: 405
+        center_y: 15
+
+<Menu>:
+    modeBTN: modeBTN
+    BoxLayout:
+        id: menu
+        size: 115,100
+        pos: 20, 680-(150)
+        orientation: "vertical"
+        spacing: 2
+
+        Button:
+            id: modeBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "Model"
+            color: violet
+            bold: True
+
+        Button:
+            id: ecoBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "ECO Mode"
+            color: violet
+            bold: True
+
+        Button:
+            id: helpBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "Help"
+            color: violet
+            bold: True
+
+<BtnMenu>:
+    btnMenuToggle: btnMenuToggle
+
+    Widget:
+        ToggleButton:
+            id: btnMenuToggle
+            size: 27, 20
+            pos: 20, 640
+            background_normal: 'graphic/btn_menu.png'
+            background_down: 'graphic/btn_menu_down.png'
+
+<SettingsScreen>:
+    BoxLayout:
+        Button:
+            text: 'My settings button'
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'

@@ -67,6 +67,8 @@ class CalculationTime:
         self.popProtect = ""
         self.turnOn = ""
         self.model = ""
+        self.processing_time = 0
+
 
     def callFrame(self, frame, turnOn, modelActive):
         self.frame = frame
@@ -79,28 +81,29 @@ class CalculationTime:
             self.statusFace()
         else:
             self.resetValue()
+            self.processing_time = 0
 
     def facedDetect(self):
         gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+        self.predictStart = cv2.getTickCount()
 
-        start = cv2.getTickCount()
+        if self.modelActive == 0:  # haar model
 
-        if self.modelActive == 0:
             self.face = haarModel.detectMultiScale(gray, 1.3, 5)
 
-
-        elif self.modelActive == 1:
+        elif self.modelActive == 1:  # hog model
             self.face = hogModel(gray, 0)
 
-        elif self.modelActive == 2:
+        elif self.modelActive == 2:  # deep model
             self.face = dnnPredict(self.frame, deepModel)
             if self.face is None:
                 self.face = ()
 
-        print(cv2.cv2.getTickFrequency())
-        # proTime = ((cv2.getTickCount() - start) / cv2.getTickFrequency()) * 1000
+        self.predictEnd = cv2.getTickCount()
+        self.processing_time = ((self.predictEnd - self.predictStart) / cv2.getTickFrequency())
 
-        # print(f'{proTime: .2f}ms/f')
+    def timeProcessing(self):
+        return self.processing_time
 
     def drawFace(self):
 
