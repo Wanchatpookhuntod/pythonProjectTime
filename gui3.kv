@@ -1,39 +1,21 @@
 
-<FrameToKivy>:
-
-<Main>:
-    frameToKivy: frameToKivy
-    btnStart: btnStart
-
 #:set violet (106/255, 0/255, 255/255, 1)
 #:set wWindow 640*.7
 #:set hWindow 680
 #:set fontColor (42/255, 38/255, 38/255, 1)
 
-#    BoxLayout:
-#    Button:
-#        text: 'Goto settings'
-#        on_press: root.manager.current = 'settings'
-#        height: 138
-#        width: 138
-#    BoxLayout:
-#        size: 100,100
-#        orientation: "vertical"
+<FrameToKivy>:
 
-    Widget:
-        Button:
-            text: 'Goto settings'
-            on_press: root.manager.current = 'settings'
-    Widget:
-        ToggleButton:
-            id: btnStart
-            background_normal: 'graphic/btn_start.png'
-            background_down: 'graphic/btn_stop.png'
-            height: 138
-            width: 138
-            center_x: root.width * .5
-            center_y: 200
-            on_press: root.detect_toggle()
+<Main>:
+    frameToKivy: frameToKivy
+
+    id: main
+    canvas.before:
+        Color:
+            rgb: 228/255, 228/255, 228/255
+
+        Rectangle:
+            size: self.size
 
     Widget
         FrameToKivy:
@@ -47,8 +29,6 @@
             Rectangle:
                 size: 448,30
                 source: 'graphic/tab_foot.png'
-
-
 
 <TabValue>:
     textModel: textModel
@@ -66,7 +46,7 @@
     Label:
         id: textModel
         font_size: 16
-        center_x: root.width * .5
+        center_x: wWindow * .5
         center_y: 160
         color: fontColor
         text: "HAAR"
@@ -95,14 +75,26 @@
         center_y: 84
         font_size: 20
 
-
     Label:
         id: labelTimeProcess
         center_x: 405
         center_y: 15
 
+<BtnStart>:
+    btn: btn
+    Widget:
+        ToggleButton:
+            id: btn
+            background_normal: 'graphic/btn_start.png'
+            background_down: 'graphic/btn_stop.png'
+            height: 138
+            width: 138
+            center_x: wWindow * .5
+            center_y: 200
+#            on_press: root.detect_toggle()
+
 <Menu>:
-    modeBTN: modeBTN
+    modelBTN: modelBTN
     BoxLayout:
         id: menu
         size: 115,100
@@ -111,7 +103,7 @@
         spacing: 2
 
         Button:
-            id: modeBTN
+            id: modelBTN
             background_normal: 'graphic/btNormal.png'
             background_down: 'graphic/btDown.png'
             text: "Model"
@@ -151,4 +143,64 @@
             text: 'My settings button'
         Button:
             text: 'Back to menu'
-            on_press: root.manager.current = 'menu'
+            on_press: root.manager.current = 'main'
+
+<PanelModel>:
+    btnHAAR: btnHAAR
+    btnHOG: btnHOG
+    btnDNN: btnDNN
+    btnClosedPanelModel:btnClosedPanelModel
+
+    Widget:
+        id: bgPanelModel
+        pos: 16, 55
+        canvas.before:
+            Rectangle:
+                id: bgPanelModel_1
+                size:416, 600
+                pos: bgPanelModel.pos
+                source: "graphic/panelBig.png"
+
+        Button:
+            id: btnClosedPanelModel
+            size: 40, 40
+            background_normal: "graphic/btnClosed.png"
+            background_down: "graphic/btnClosed.png"
+            pos: 384, 606
+
+        BoxLayout:
+            pos: 109, 325
+            orientation: "vertical"
+            size: 230, 179
+            spacing: 12
+
+            ToggleButton:
+                id: btnHAAR
+                size: 230, 50
+                background_normal: "graphic/bgBtnModelNormal.png"
+                background_down: "graphic/bgBtnModelDown.png"
+                color: violet
+                text: "HAAR"
+
+
+            ToggleButton:
+                id: btnHOG
+                size: 230, 50
+                background_normal: "graphic/bgBtnModelNormal.png"
+                background_down: "graphic/bgBtnModelDown.png"
+                color: violet
+                text: "HOG"
+
+            ToggleButton:
+                id: btnDNN
+                size: 230, 50
+                background_normal: "graphic/bgBtnModelNormal.png"
+                background_down: "graphic/bgBtnModelDown.png"
+                color: violet
+                text: "DEEP"
+
+        Widget:
+            canvas:
+                Rectangle:
+                    size: 448,30
+                    source: 'graphic/tab_foot.png'

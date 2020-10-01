@@ -1,114 +1,58 @@
 from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy.uix.togglebutton import ToggleButton
 from kivy.core.window import Window
-from kivy.uix.image import Image
 from kivy.clock import Clock
-from kivy.graphics.texture import Texture
-from kivy.properties import ObjectProperty
-from functools import partial
-
+from kivy.uix.boxlayout import BoxLayout
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
-import videoProcessing as vdo
+from kivy.uix.button import Button
 
-from videoProcessing import CalculationTime
-
-_CalculationTime = CalculationTime()
-Window.size = (640 * .7, 680)
-Builder.load_file("UI_demo.kv")
-
-class FrameToKivy(Image):
-
-    def outputFrame(self, frame):
-        buf = vdo.bufFrame(frame)
-        image_texture = Texture.create(size=(buf["rows"], buf["cols"]), colorfmt='bgr')
-        image_texture.blit_buffer(buf["buf"], colorfmt='bgr', bufferfmt='ubyte')
-        self.texture = image_texture
-
-class TabValue(Widget):
+class MyLayout(BoxLayout):
     pass
 
-class Menu(Widget):
-    pass
+class HoverButton(Button):
+    def __init__(self, **kwargs):
+        # Call the initialization function of the parent class
+        super(HoverButton, self).__init__(**kwargs)
+        # Set the control to fill horizontally and set the height vertically
+        self.size_hint = (1, None)
+        self.height = 50
+        # binding[subscribe]Event handling method of mouse position change
+        Window.bind(mouse_pos=self.on_mouse_pos)
+        Window.set_system_cursor('arrow')
 
-class BtnMenu(Widget):
-    pass
+   # Mouse position processing method
+    def on_mouse_pos(self, *args):
+        # Determine whether the control is in root In root control
+        if not self.get_root_window():
+           return
+        # Get mouse position data
+        pos = args[1]
+        # Check whether the mouse position is in the control
+        if self.collide_point(*pos):
+           # If on a control, the style method entered by the mouse is called
+           Clock.schedule_once(self.mouse_enter_css, 0)
+        else:
+           # If on a control, the style method of mouse out is called
+           Clock.schedule_once(self.mouse_leave_css, 0)
 
-class Main(Screen, Widget):
-    frameToKivy = ObjectProperty(None)
-    btnStart = ObjectProperty(None)
-    textLookTime = ObjectProperty(None)
-    textStatusRisk = ObjectProperty(None)
-    textGaze = ObjectProperty(None)
-    textModel = ObjectProperty(None)
-    btnMenuToggle = ObjectProperty(None)
-    menu = ObjectProperty(None)
-    modeBTN = ObjectProperty(None)
-    # labelTimeProcess = ObjectProperty(None)
-    # tabValue = ObjectProperty(None)
+    def mouse_leave_css(self, *args):
+        # Reset background and mouse style
+        self.background_normal = 'res/btn_1.png'
+        Window.set_system_cursor('arrow')
 
-    def __init__(self, cap, **kwargs):
-        super(Main, self).__init__(**kwargs)
-        self.cap = cap
-        self.output = self.frameToKivy
-        self.turnOn = False
-        self.tabValue = TabValue()
-        self.btnMenu = BtnMenu()
-        self.menuGUI = Menu()
-        Clock.schedule_interval(self.update, 1 / 30)
-        self.add_widget(self.btnMenu)
+    def mouse_enter_css(self, *args):
+        Window.set_system_cursor('hand')
+        self.background_normal = 'res/btn_2.png'
 
-
-
-
-
-    def whenOnStart(self):
-        self.remove_widget(self.tabValue)
-
-        if self.turnOn:
-            self.tabValue.textLookTime.text = _CalculationTime.getTimeLook()
-            self.tabValue.textStatusRisk.text = _CalculationTime.getStatusText()[0]
-            self.tabValue.textGaze.text = str(_CalculationTime.getStatusFace())
-            self.add_widget(self.tabValue)
-            self.tabValue.labelTimeProcess.text = f"{_CalculationTime.timeProcessing():.2f} f/s"
-
-
-    def detect_toggle(self):
-        self.turnOn = True if self.btnStart.state == "down" else False
-        self.btnStart.center_y = 262 if self.turnOn else 200
-
-    def menuFunc(self):
-        self.remove_widget(self.menuGUI)
-
-        if self.btnMenu.btnMenuToggle.state == "down":
-            self.add_widget(self.menuGUI)
-
-
-    def update(self, dt):
-        frame = self.cap.read()[1]
-        _CalculationTime.callFrame(frame, self.turnOn, 0)
-
-        # self.whenOffStart()
-        self.whenOnStart()
-        self.menuFunc()
-
-        self.output.outputFrame(frame)
-
-class SettingsScreen(Screen):
-    pass
-
-capture = vdo.cameraOpen()
-
-sm = ScreenManager()
-sm.add_widget(Main(cap=capture, name='menu'))
-sm.add_widget(SettingsScreen(name='settings'))
-
-class TestApp(App):
-
+class MainApp(App):
     def build(self):
-        return sm
+        # Form not full screen
+        Window.fullscreen = False
+
+        # load kv File layout data
+        Builder.load_file('demoGUI.kv')
+        # return root Root control
+        return MyLayout()
+
 
 if __name__ == '__main__':
-    TestApp().run()
+    MainApp().run()

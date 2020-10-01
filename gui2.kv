@@ -1,6 +1,9 @@
+#:set violet (106/255, 0/255, 255/255, 1)
+#:set wWindow 640*.7
+#:set hWindow 680
+#:set fontColor (42/255, 38/255, 38/255, 1)
+
 <FrameToKivy>:
-
-
 
 <Main>:
     frameToKivy: frameToKivy
@@ -21,16 +24,9 @@
     bgPanelModel: menuPanelModel.bgPanelModel_1
     labelTimeProcess: labelTimeProcess
 
-
-
-
-
 #    modeBTN: modeBTN
 
-    #:set violet (106/255, 0/255, 255/255, 1)
-    #:set wWindow 640*.7
-    #:set hWindow 680
-    #:set fontColor (42/255, 38/255, 38/255, 1)
+
     id: main
     canvas.before:
         Color:
@@ -38,8 +34,6 @@
 
         Rectangle:
             size: self.size
-
-
 
     FrameToKivy:
         id: frameToKivy
@@ -62,7 +56,7 @@
             Rectangle:
                 size: 436, 161
                 pos: 7, 36
-                source: 'graphic/tab_status.png'
+                source: 'graphic/tab_value.png'
 
         Label:
             id: textModel
@@ -150,9 +144,6 @@
 
     MenuPanelModel:
         id: menuPanelModel
-
-
-
 
 <LineInBOX>:
     canvas:
