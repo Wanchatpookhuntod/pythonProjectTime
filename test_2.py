@@ -38,7 +38,7 @@ class CircularProgressBar(ProgressBar):
             # Draw progress circle, small hack if there is no progress (angle_end = 0 results in full progress)
             Color(1, 0, 0)
             Ellipse(pos=self.pos, size=self.size,
-                    angle_end=(0.001 if self.value_normalized == 0 else self.value_normalized * 360))
+                    angle_end=(0.001 if (self.value/100) == 0 else (self.value / 100) * 360))
 
             # Draw the inner circle (colour should be equal to the background)
             Color(0, 0, 0)
@@ -70,12 +70,15 @@ class CircularProgressBar(ProgressBar):
         # Draw all the elements
         self.draw()
 
+        print(f'{value, self.value}')
 
 class Main(App):
 
     # Simple animation to show the circular progress bar in action
     def animate(self, dt):
-        if self.root.value < 80:
+        y = 15
+        x = (y * 80) / y
+        if self.root.value < x:
             self.root.set_value(self.root.value + 1)
         else:
             self.root.set_value(0)
@@ -90,7 +93,7 @@ class Main(App):
     max: 80''')
 
         # Animate the progress bar
-        Clock.schedule_interval(self.animate, 0.1)
+        Clock.schedule_interval(self.animate, 1/30)
         return container
 
 

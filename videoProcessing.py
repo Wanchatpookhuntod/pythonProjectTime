@@ -42,7 +42,6 @@ def dnnPredict(img, model):
         return box
 
 
-
 toaster = ToastNotifier()
 
 class CalculationTime:
@@ -68,12 +67,15 @@ class CalculationTime:
         self.turnOn = ""
         self.model = ""
         self.processing_time = 0
+        self.lookSecond = 0
+        self.limit = 0
 
 
-    def callFrame(self, frame, turnOn, modelActive):
+    def callFrame(self, frame, turnOn, modelActive, limit):
         self.frame = frame
         self.turnOn = turnOn
         self.modelActive = modelActive
+        self.limit = limit
 
         if self.turnOn:
             self.facedDetect()
@@ -82,6 +84,7 @@ class CalculationTime:
         else:
             self.resetValue()
             self.processing_time = 0
+
 
     def facedDetect(self):
         gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
@@ -156,10 +159,10 @@ class CalculationTime:
         if self.lookMin > self.breakMin:
             print("Pop up 15 sec.")
 
-        if self.lookSecond > 10:
+        if self.lookSecond > self.limit:
             toaster.show_toast(title=f"{self.titlePopup} !!!",
                                msg=f"{self.msgPopup} {self.timeLook} .\n"
-                                   f"So you should rest your eyes for 15 seconds..",
+                                   f"So you should rest your eyes for {self.limit} seconds..",
                                icon_path="graphic/icon.ico",
                                duration=5,
                                threaded=True)
@@ -190,3 +193,6 @@ class CalculationTime:
 
     def getStatusFace(self):
         return self.status
+
+    def getLookSecond(self):
+        return self.lookSecond
