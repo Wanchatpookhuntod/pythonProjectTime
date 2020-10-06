@@ -7,7 +7,7 @@ from kivy.core.window import Window
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, BooleanProperty
 from functools import partial
 from kivy.lang import Builder
 
@@ -16,14 +16,23 @@ from videoProcessing import CalculationTime
 
 _CalculationTime = CalculationTime()
 Window.size = (640 * .7, 680)
-Builder.load_file("gui3.kv")
+Builder.load_file("gui4.kv")
 
 class FrameToKivy(Image):
-    def outputFrame(self, frame):
-        buf = vdo.bufFrame(frame)
-        image_texture = Texture.create(size=(buf["rows"], buf["cols"]), colorfmt='bgr')
-        image_texture.blit_buffer(buf["buf"], colorfmt='bgr', bufferfmt='ubyte')
-        self.texture = image_texture
+    def outputFrame(self, frame, eco):
+
+        if eco:
+            gray = vdo.ecoFrame(frame)
+            buf = vdo.bufFrame(gray)
+            image_texture = Texture.create(size=(buf["rows"], buf["cols"]), colorfmt='luminance')
+            image_texture.blit_buffer(buf["buf"], colorfmt='luminance', bufferfmt='ubyte')
+            self.texture = image_texture
+
+        else:
+            buf = vdo.bufFrame(frame)
+            image_texture = Texture.create(size=(buf["rows"], buf["cols"]), colorfmt='bgr')
+            image_texture.blit_buffer(buf["buf"], colorfmt='bgr', bufferfmt='ubyte')
+            self.texture = image_texture
 
 class TabValue(Widget):
     pass
@@ -143,6 +152,8 @@ class CircularProgressBar(ProgressBar):
         else:
             self.set_value(0)
 
+class WordIntro(Widget):
+    pass
 
 class PanelModel(Widget):
     btnHAAR = ObjectProperty(None)
@@ -189,21 +200,34 @@ class PanelModel(Widget):
     def update(self, dt):
         self.btnModelTask()
 
+class Help(Widget):
+    pass
 
 class Main(Widget):
     frameToKivy = ObjectProperty(None)
     btnStart = ObjectProperty(None)
     menu = ObjectProperty(None)
 
+
     def __init__(self, cap, **kwargs):
         super(Main, self).__init__(**kwargs)
+
         self.cap = cap
         self.output = self.frameToKivy
         self.turnOn = False
+
+        self._help = Help()
+        self._help.btnClosedPanelHelp.bind(on_press=self.closedHelpMode)
+
         self.circularBar = CircularProgressBar()
-        # self.remove_widget(self.circularBar)
+
+        self.ecoMode = False
+
+        self._wordIntro = WordIntro()
+        self.add_widget(self._wordIntro)
 
         self.tabValue = TabValue()
+        self.tabValue.btnTextModel.bind(on_press=self.cbBtnTextModel)
 
         self.btnMenu = BtnMenu()
         self.add_widget(self.btnMenu)
@@ -218,28 +242,47 @@ class Main(Widget):
 
         self.menuGUI = Menu()
         self.menuGUI.modelBTN.bind(on_press=self.cbPanelModel)
+        self.menuGUI.ecoBTN.bind(on_press=self.openEcoMode)
+        self.menuGUI.helpBTN.bind(on_press=self.openHelpMode)
 
     def whenOnStart(self):
         self.remove_widget(self.tabValue)
         self.remove_widget(self.circularBar)
 
         if self.turnOn:
+
             self.add_widget(self.tabValue)
+            self.add_widget(self.circularBar)
             self.circularBar._lookTime = _CalculationTime.getLookSecond()
             self.tabValue.textLookTime.text = _CalculationTime.getTimeLook()
             self.tabValue.textStatusRisk.text = _CalculationTime.getStatusText()[0]
             self.tabValue.textGaze.text = str(_CalculationTime.getStatusFace())
             self.tabValue.textModel.text = self.panelModel.nameModel
             self.tabValue.labelTimeProcess.text = f"{_CalculationTime.timeProcessing():.2f} f/s"
-            self.add_widget(self.circularBar)
+
 
     def detect_toggle(self, instance):
         if self.btnStart.btn.state == "down":
-            self.turnOn = True
-            self.btnStart.btn.center_y = 262
+            self.afterStart()
         else:
-            self.turnOn = False
-            self.btnStart.btn.center_y = 200
+            self.beforeStart()
+
+    def afterStart(self):
+        self.turnOn = True
+        self.btnStart.btn.center_y = 382
+        self.btnStart.btn.height = 32
+        self.btnStart.btn.width = 100
+        self.btnStart.btn.center_x = self.width * .5
+        self.remove_widget(self._wordIntro)
+
+
+    def beforeStart(self):
+        self.turnOn = False
+        self.btnStart.btn.center_y = 270
+        self.btnStart.btn.height = 40
+        self.btnStart.btn.width = 130
+        self.btnStart.btn.center_x = self.width * .5
+        self.add_widget(self._wordIntro)
 
     def menuFunc(self):
         self.remove_widget(self.menuGUI)
@@ -247,44 +290,76 @@ class Main(Widget):
             self.add_widget(self.menuGUI)
 
     def cbPanelModel(self, instance):
-        self.add_widget(self.panelModel)
-        self.btnMenu.btnMenuToggle.state = "normal"
-        self.remove_widget(self.btnMenu)
-        self.remove_widget(self.btnStart)
-
-        # set button start
-        self.turnOn = False
-        self.btnStart.btn.state = "normal"
-        self.btnStart.btn.center_y = 200
+        self.whenOpenPanelModel()
 
     def cbClosePanelModel(self, instance):
         self.remove_widget(self.panelModel)
         self.add_widget(self.btnMenu)
         self.add_widget(self.btnStart)
 
-        # set button start
-        self.turnOn = True
         self.btnStart.btn.state = "down"
-        self.btnStart.btn.center_y = 262
+        self.afterStart()
+
+    def openEcoMode(self, instance):
+        if self.menuGUI.ecoBTN.state == "down":
+            self.ecoMode = True
+        else:
+            self.ecoMode = False
+
+        self.btnMenu.btnMenuToggle.state = "normal"
+        self.remove_widget(self.menuGUI)
+
+    def openHelpMode(self, instance):
+        if self.menuGUI.helpBTN.state == "down":
+            self.add_widget(self._help)
+            self.remove_widget(self.menuGUI)
+            self.remove_widget(self.btnMenu)
+            self.remove_widget(self.btnStart)
+            self.btnMenu.btnMenuToggle.state = "normal"
+            self.turnOn = False
+        else:
+            self.remove_widget(self._help)
+
+
+    def closedHelpMode(self, instance):
+        self.add_widget(self.menuGUI)
+        self.add_widget(self.btnMenu)
+        self.add_widget(self.btnStart)
+        self.remove_widget(self._help)
+        self.menuGUI.helpBTN.state = "normal"
+        self.turnOn = True
+
+
+    def cbBtnTextModel(self, instance):
+        self.whenOpenPanelModel()
+
+    def whenOpenPanelModel(self):
+        self.add_widget(self.panelModel)
+        self.btnMenu.btnMenuToggle.state = "normal"
+        self.remove_widget(self.btnMenu)
+        self.remove_widget(self.btnStart)
+        self.remove_widget(self._wordIntro)
+
+        self.turnOn = False
+        self.btnStart.btn.state = "normal"
+        self.btnStart.btn.center_y = 200
 
     def update(self, dt):
-        frame = self.cap.read()[1]
-        limit = 60
-        _CalculationTime.callFrame(frame, self.turnOn, self.panelModel.modelActive, limit)
-
         # GUI
+        limit = 60
         self.whenOnStart()
         self.menuFunc()
-        self.output.outputFrame(frame)
-
-        # Circle bar
         self.circularBar.turnOn = self.turnOn
         self.circularBar.limit = limit
 
-        # Window size fixed
         if Window.size[0] < 640 * .7 or Window.size[1] < 680 or \
                 Window.size[0] > 640 * .7 or Window.size[1] > 680:
             Window.size = (640 * .7, 680)
+
+        # Frame
+        frame = self.cap.read()[1]
+        _CalculationTime.callFrame(frame, self.turnOn, self.panelModel.modelActive, limit, self.ecoMode)
+        self.output.outputFrame(frame, self.ecoMode)
 
 
 class TestApp(App):

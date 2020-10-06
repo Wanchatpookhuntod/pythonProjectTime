@@ -15,6 +15,10 @@ def bufFrame(frame):
     buf = buf1.tostring()
     return {"rows": rows, "cols": cols, "buf": buf}
 
+def ecoFrame(frame):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    return gray
+
 haarModel = cv2.CascadeClassifier('res/haarcascade_frontalface_default.xml')
 
 hogModel = dlib.get_frontal_face_detector()
@@ -69,13 +73,15 @@ class CalculationTime:
         self.processing_time = 0
         self.lookSecond = 0
         self.limit = 0
+        self.eco = False
 
 
-    def callFrame(self, frame, turnOn, modelActive, limit):
+    def callFrame(self, frame, turnOn, modelActive, limit, eco):
         self.frame = frame
         self.turnOn = turnOn
         self.modelActive = modelActive
         self.limit = limit
+        self.eco = eco
 
         if self.turnOn:
             self.facedDetect()
@@ -109,18 +115,20 @@ class CalculationTime:
         return self.processing_time
 
     def drawFace(self):
-
-        violet = (255, 54, 118)
+        if not self.eco:
+            color = (255, 0, 106)
+        else:
+            color = (0, 0, 0)
 
         if self.modelActive == 0:
             for x, y, w, h in self.face:
-                cv2.rectangle(self.frame, (x, y), (x + w, y + h), violet, 2)
+                cv2.rectangle(self.frame, (x, y), (x + w, y + h), color, 2)
 
         elif self.modelActive == 1:
             for det in self.face:
                 xy = det.left(), det.top()
                 wh = det.right(), det.bottom()
-                cv2.rectangle(self.frame, xy, wh, violet, 2)
+                cv2.rectangle(self.frame, xy, wh, color, 2)
 
         elif self.modelActive == 2:
             if self.face != ():
@@ -133,7 +141,7 @@ class CalculationTime:
                 left = left - margin if (bottom - top - right + left) % 2 == 0 else left - margin - 1
                 right = right + margin
 
-                cv2.rectangle(self.frame, (left, top), (right, bottom), violet, 2)
+                cv2.rectangle(self.frame, (left, top), (right, bottom), color, 2)
 
 
     def statusFace(self):
@@ -155,6 +163,8 @@ class CalculationTime:
         self.timeLook = time.strftime("%H:%M:%S", time.gmtime(self.lookCom))
 
         self.lookHour, self.lookMin, self.lookSecond = time.gmtime(self.lookCom)[3:6]
+
+        # print(self.lookCom)
 
         if self.lookMin > self.breakMin:
             print("Pop up 15 sec.")
@@ -195,4 +205,4 @@ class CalculationTime:
         return self.status
 
     def getLookSecond(self):
-        return self.lookSecond
+        return self.lookCom

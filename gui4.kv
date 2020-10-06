@@ -1,0 +1,292 @@
+
+#:set violet (106/255, 0/255, 255/255, 1)
+#:set wWindow 640*.7
+#:set hWindow 680
+#:set fontColor (245/255, 245/255, 245/255, 1)
+
+<FrameToKivy>:
+
+<Main>:
+    frameToKivy: frameToKivy
+
+    id: main
+    canvas.before:
+        Color:
+            rgb: 30/255, 30/255, 30/255
+
+        Rectangle:
+            size: self.size
+
+    Widget
+        FrameToKivy:
+            id: frameToKivy
+            size: 640 * .7, 480 * .7
+            pos: 0, 680 - (480 * .7)
+
+    Widget:
+        id: tabFoot
+        canvas:
+            Rectangle:
+                size: 448,30
+                source: 'graphic/tab_foot.png'
+
+<TabValue>:
+    textModel: textModel
+    btnTextModel: btnTextModel
+    textStatusRisk: textStatusRisk
+    textLookTime: textLookTime
+    textGaze: textGaze
+    labelTimeProcess: labelTimeProcess
+
+    canvas.before:
+        Rectangle:
+            size: 434, 176
+            pos: 7, 30
+            source: 'graphic/tab_value_black.png'
+
+    Button:
+        id: btnTextModel
+        font_size: 16
+        center_x: wWindow * .5
+        center_y: 206
+        color: fontColor
+        height: 25
+
+        canvas:
+            Color:
+                rgb: 52/255, 52/255, 52/255
+            Rectangle:
+                size: btnTextModel.size
+                pos: btnTextModel.pos
+
+        Label:
+            id: textModel
+            text: "HAAR"
+            size: btnTextModel.size
+            pos: btnTextModel.pos
+
+    Label:
+        id: textStatusRisk
+        color: fontColor
+        center_x: 84
+        center_y: 83
+        font_size: 20
+
+    Label:
+        id: textLookTime
+        color: fontColor
+        center_x: 237
+        center_y: 83
+        font_size: 20
+
+    Label:
+        id: textGaze
+        color: fontColor
+        center_x: 380
+        center_y: 83
+        font_size: 20
+
+    Label:
+        id: labelTimeProcess
+        center_x: 405
+        center_y: 15
+        font_size: 12
+
+<BtnStart>:
+    btn: btn
+
+    Widget:
+        ToggleButton:
+            id: btn
+            background_normal: 'graphic/btn_start_black.png'
+            background_down: 'graphic/btn_stop_black.png'
+            height: 40
+            width: 130
+            center_x: wWindow * .5
+            center_y: 270
+#            on_focus: root.p()
+
+
+<WordIntro>:
+    wordIntro: wordIntro
+    Widget:
+        BoxLayout:
+            id: wordIntro
+            center_x: wWindow * .5
+            center_y: 160
+            size: 100, 100
+            orientation: "vertical"
+            Label:
+                text: "Let's go Eye break "
+                font_size: 18
+                halign: "center"
+
+            Label:
+                text: "application for healthy and care"
+                font_size: 18
+
+            Label:
+                text: "your eyes"
+                font_size: 18
+
+
+<Menu>:
+    modelBTN: modelBTN
+    ecoBTN: ecoBTN
+    helpBTN: helpBTN
+    BoxLayout:
+        id: menu
+        size: 115,100
+        pos: 20, 680-(150)
+        orientation: "vertical"
+        spacing: 2
+
+        Button:
+            id: modelBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "Model"
+            color: violet
+            bold: True
+
+        ToggleButton:
+            id: ecoBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "ECO Mode"
+            color: violet
+            bold: True
+
+        Button:
+            id: helpBTN
+            background_normal: 'graphic/btNormal.png'
+            background_down: 'graphic/btDown.png'
+            text: "Help"
+            color: violet
+            bold: True
+
+<BtnMenu>:
+    btnMenuToggle: btnMenuToggle
+
+    Widget:
+        ToggleButton:
+            id: btnMenuToggle
+            size: 27, 20
+            pos: 20, 640
+            background_normal: 'graphic/btn_menu.png'
+            background_down: 'graphic/btn_menu_down.png'
+
+
+
+<PanelModel>:
+    btnHAAR: btnHAAR
+    btnHOG: btnHOG
+    btnDNN: btnDNN
+    btnClosedPanelModel:btnClosedPanelModel
+
+    Widget:
+        id: bgPanelModel
+        pos: 16, 55
+        canvas.before:
+            Rectangle:
+                id: bgPanelModel_1
+                size:416, 600
+                pos: bgPanelModel.pos
+                source: "graphic/panelBig.png"
+
+        Button:
+            id: btnClosedPanelModel
+            size: 40, 40
+            background_normal: "graphic/btnClosed.png"
+            background_down: "graphic/btnClosed.png"
+            pos: 384, 606
+
+        BoxLayout:
+            pos: 109, 325
+            orientation: "vertical"
+            size: 230, 179
+            spacing: 12
+
+            ToggleButton:
+                id: btnHAAR
+                size: 230, 50
+                background_normal: "graphic/bgBtnModelNormal.png"
+                background_down: "graphic/bgBtnModelDown.png"
+                color: violet
+                text: "HAAR"
+
+
+            ToggleButton:
+                id: btnHOG
+                size: 230, 50
+                background_normal: "graphic/bgBtnModelNormal.png"
+                background_down: "graphic/bgBtnModelDown.png"
+                color: violet
+                text: "HOG"
+
+            ToggleButton:
+                id: btnDNN
+                size: 230, 50
+                background_normal: "graphic/bgBtnModelNormal.png"
+                background_down: "graphic/bgBtnModelDown.png"
+                color: violet
+                text: "DEEP"
+
+        Widget:
+            canvas:
+                Rectangle:
+                    size: 448,30
+                    source: 'graphic/tab_foot.png'
+
+<CircularProgressBar>:
+    size_hint: (None, None)
+    height: 120
+    width: 120
+    max: 80
+    center_x: wWindow * .5
+    center_y: 273
+
+<Help>:
+    btnClosedPanelHelp: btnClosedPanelHelp
+    canvas.before:
+        Rectangle:
+            pos: 16, 55
+            size:416, 600
+            source: "graphic/panelBig.png"
+
+    Label:
+        pos: 62, 590
+        size: 52, 22
+        font_size: 18
+        text: "About"
+        bold: True
+        halign: "left"
+
+    Label:
+        font_size: 16
+        size: 320, 60
+        pos: 62, 520
+        text: "Eyes Break will signal to you when your have\nlook duration not appropriate and risk\ncomputer vision syndrome."
+        halign: "left"
+
+    Label:
+        pos: 62, 450
+        size: 225, 22
+        font_size: 18
+        text: "Computer Vision Syndrome"
+        bold: True
+        halign: "left"
+
+    Label:
+        font_size: 16
+        size: 331, 140
+        pos: 62, 305
+        text: "Computer vision syndrome, also referred to as\ndigital eye strain, describes a group of eye and \nvision related problems that result from\nprolonged computer, tablet, e-reader and cell\nphone use. Many individuals experience eye\ndiscomfort and vision problems when viewing\ndigital screens for extended periods."
+        halign: "left"
+
+    Button:
+        id: btnClosedPanelHelp
+        size: 40, 40
+        background_normal: "graphic/btnClosed.png"
+        background_down: "graphic/btnClosed.png"
+        pos: 384, 606
