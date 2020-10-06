@@ -7,7 +7,7 @@ from kivy.core.window import Window
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.properties import ObjectProperty, BooleanProperty
+from kivy.properties import ObjectProperty
 from functools import partial
 from kivy.lang import Builder
 
@@ -244,14 +244,15 @@ class Main(Widget):
         self.menuGUI.modelBTN.bind(on_press=self.cbPanelModel)
         self.menuGUI.ecoBTN.bind(on_press=self.openEcoMode)
         self.menuGUI.helpBTN.bind(on_press=self.openHelpMode)
+        self.l = False
 
     def whenOnStart(self):
         self.remove_widget(self.tabValue)
         self.remove_widget(self.circularBar)
 
         if self.turnOn:
-
             self.add_widget(self.tabValue)
+            self.l = True
             self.add_widget(self.circularBar)
             self.circularBar._lookTime = _CalculationTime.getLookSecond()
             self.tabValue.textLookTime.text = _CalculationTime.getTimeLook()
@@ -259,7 +260,8 @@ class Main(Widget):
             self.tabValue.textGaze.text = str(_CalculationTime.getStatusFace())
             self.tabValue.textModel.text = self.panelModel.nameModel
             self.tabValue.labelTimeProcess.text = f"{_CalculationTime.timeProcessing():.2f} f/s"
-
+        else:
+            self.l = False
 
     def detect_toggle(self, instance):
         if self.btnStart.btn.state == "down":
@@ -316,9 +318,15 @@ class Main(Widget):
             self.remove_widget(self.btnMenu)
             self.remove_widget(self.btnStart)
             self.btnMenu.btnMenuToggle.state = "normal"
-            self.turnOn = False
+            # self.turnOn = False
+            self.remove_widget(self._wordIntro)
         else:
             self.remove_widget(self._help)
+
+        if self.l:
+            # self.remove_widget(self.tabValue)
+            self.turnOn = False
+            self.isTurnOn = True
 
 
     def closedHelpMode(self, instance):
@@ -327,8 +335,7 @@ class Main(Widget):
         self.add_widget(self.btnStart)
         self.remove_widget(self._help)
         self.menuGUI.helpBTN.state = "normal"
-        self.turnOn = True
-
+        # self.turnOn = True
 
     def cbBtnTextModel(self, instance):
         self.whenOpenPanelModel()
@@ -360,6 +367,8 @@ class Main(Widget):
         frame = self.cap.read()[1]
         _CalculationTime.callFrame(frame, self.turnOn, self.panelModel.modelActive, limit, self.ecoMode)
         self.output.outputFrame(frame, self.ecoMode)
+
+        print(self.l)
 
 
 class TestApp(App):

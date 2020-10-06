@@ -164,8 +164,6 @@ class CalculationTime:
 
         self.lookHour, self.lookMin, self.lookSecond = time.gmtime(self.lookCom)[3:6]
 
-        # print(self.lookCom)
-
         if self.lookMin > self.breakMin:
             print("Pop up 15 sec.")
 
