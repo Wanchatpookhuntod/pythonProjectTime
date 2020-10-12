@@ -72,15 +72,19 @@ class CalculationTime:
         self.model = ""
         self.processing_time = 0
         self.lookSecond = 0
-        self.limit = 0
+        self.eyeBreakSec = 0
         self.eco = False
+        self.total = 0
+        self.numberBreak = 0
+        self.a = 0
+        self.go = False
 
 
     def callFrame(self, frame, turnOn, modelActive, limit, eco):
         self.frame = frame
         self.turnOn = turnOn
         self.modelActive = modelActive
-        self.limit = limit
+        self.eyeBreakSec = limit
         self.eco = eco
 
         if self.turnOn:
@@ -145,32 +149,71 @@ class CalculationTime:
 
 
     def statusFace(self):
+        # if self.face != ():  # พบใบหน้า
+        #     self.status = True
+        #     self.lookCom = time.time() - self.startFace  # จับเวลามองจอ
+        #     self.noLookCom = 0  # reset เวลาไม่มองจอ
+        #     self.startNoFace = time.time()  # reset การเริ่มไม่มองจอ
+        #
+        # else:
+        #     self.status = False
+        #     self.noLookCom = time.time() - self.startNoFace  # จับไม่เวลามองจอ
+        #
+        #     if self.noLookCom > self.rateReset:  # ถ้าเวลาไม่มองจอมากกว่าเวลา reset
+        #         self.lookCom = 0  # reset เวลาไมองจอ
+        #         self.startFace = time.time()  # reset การเริ่มมองจอ
+        #     else:  # ถ้าเวลาไม่มองจอยังไม่ถึงเวลา reset ก็ยังจับเวลามองจอต่อไป
+        #         self.lookCom = time.time() - self.startFace
+
+        # if self.lookCom > self.eyeBreakSec and self.noLookCom > self.rateReset:
+        #     self.x += 1
+        #
+        # print(f"{self.lookCom} > {self.eyeBreakSec} and {self.noLookCom} > {self.rateReset}")
+
+        if self.numberBreak > 5:
+            self.numberBreak = 0
+
         if self.face != ():  # พบใบหน้า
             self.status = True
-            self.lookCom = time.time() - self.startFace
-
-            self.startNoFace = time.time()
-            self.noLookCom = 0
+            self.lookCom = time.time() - self.startFace  # จับเวลามองจอ
+            self.noLookCom = 0  # reset เวลาไม่มองจอ
+            self.startNoFace = time.time()  # reset การเริ่มไม่มองจอ
 
         else:
-            self.status = False  # ไม่พบใบหน้า
-            self.noLookCom = time.time() - self.startNoFace
+            self.status = False
+            self.noLookCom = time.time() - self.startNoFace  # จับไม่เวลามองจอ
 
-            if self.noLookCom > self.rateReset:
-                self.lookCom = 0
-                self.startFace = time.time()
+            if self.noLookCom > self.rateReset:  # ถ้าเวลาไม่มองจอมากกว่าเวลา reset
+
+                if self.lookCom > self.eyeBreakSec:
+                    self.numberBreak += 1
+
+                self.lookCom = 0  # reset เวลาไมองจอ
+                self.startFace = time.time()  # reset การเริ่มมองจอ
+            else:  # ถ้าเวลาไม่มองจอยังไม่ถึงเวลา reset ก็ยังจับเวลามองจอต่อไป
+                self.lookCom = time.time() - self.startFace
+
+        if self.numberBreak > 5 and self.lookCom > self.eyeBreakSec:
+            self.numberBreak = 0
+
+        print(self.numberBreak)
 
         self.timeLook = time.strftime("%H:%M:%S", time.gmtime(self.lookCom))
+        self.timeNotLook = time.strftime("%H:%M:%S", time.gmtime(self.noLookCom))
 
         self.lookHour, self.lookMin, self.lookSecond = time.gmtime(self.lookCom)[3:6]
 
-        if self.lookMin > self.breakMin:
-            print("Pop up 15 sec.")
 
-        if self.lookSecond > self.limit:
+        # print(self.timeLook, self.timeNotLook)
+
+        if self.numberBreak > 5:
+            print("Your look at com for 2 hour.")
+
+        if self.lookCom > self.eyeBreakSec:
             toaster.show_toast(title=f"{self.titlePopup} !!!",
                                msg=f"{self.msgPopup} {self.timeLook} .\n"
-                                   f"So you should rest your eyes for {self.limit} seconds..",
+                                   f"So you should take a 20 second break\n"
+                                   f"to view something 20 feet for 20 sec.",
                                icon_path="graphic/icon.ico",
                                duration=5,
                                threaded=True)

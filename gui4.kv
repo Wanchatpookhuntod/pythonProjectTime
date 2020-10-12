@@ -8,12 +8,10 @@
 
 <Main>:
     frameToKivy: frameToKivy
-
     id: main
     canvas.before:
         Color:
             rgb: 30/255, 30/255, 30/255
-
         Rectangle:
             size: self.size
 
@@ -37,7 +35,6 @@
     textLookTime: textLookTime
     textGaze: textGaze
     labelTimeProcess: labelTimeProcess
-
     canvas.before:
         Rectangle:
             size: 434, 176
@@ -51,7 +48,6 @@
         center_y: 206
         color: fontColor
         height: 25
-
         canvas:
             Color:
                 rgb: 52/255, 52/255, 52/255
@@ -94,7 +90,6 @@
 
 <BtnStart>:
     btn: btn
-
     Widget:
         ToggleButton:
             id: btn
@@ -104,8 +99,6 @@
             width: 130
             center_x: wWindow * .5
             center_y: 270
-#            on_focus: root.p()
-
 
 <WordIntro>:
     wordIntro: wordIntro
@@ -128,7 +121,6 @@
             Label:
                 text: "your eyes"
                 font_size: 18
-
 
 <Menu>:
     modelBTN: modelBTN
@@ -167,7 +159,6 @@
 
 <BtnMenu>:
     btnMenuToggle: btnMenuToggle
-
     Widget:
         ToggleButton:
             id: btnMenuToggle
@@ -183,7 +174,6 @@
     btnHOG: btnHOG
     btnDNN: btnDNN
     btnClosedPanelModel:btnClosedPanelModel
-
     Widget:
         id: bgPanelModel
         pos: 16, 55
@@ -214,7 +204,6 @@
                 background_down: "graphic/bgBtnModelDown.png"
                 color: violet
                 text: "HAAR"
-
 
             ToggleButton:
                 id: btnHOG
@@ -290,3 +279,19 @@
         background_normal: "graphic/btnClosed.png"
         background_down: "graphic/btnClosed.png"
         pos: 384, 606
+
+<EcoGui>:
+    center_x: 74
+    center_y: 648
+    canvas.before:
+        Rectangle:
+            pos: 51, 637
+            size: 52, 24
+            source: "graphic/activeEco.png"
+
+    Label:
+        text: "ECO"
+        color: violet
+        font_size: 18
+        center_y: root.center_y
+        center_x: root.center_x+3
